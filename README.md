@@ -23,7 +23,7 @@ TFM-Mantenimiento-Predictivo-Motores/
 │   └── backlog_fase1.csv
 │
 ├── src/
-│   ├── README.md
+│   └── README.md
 │
 ├── environment/
 │   ├── README.md
