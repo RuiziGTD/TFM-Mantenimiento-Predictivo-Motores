@@ -14,24 +14,27 @@ El proyecto utiliza el dataset **NASA C-MAPSS**, ampliamente reconocido en el á
 
 ## 📂 Estructura de directorios
 
+```
 TFM-Mantenimiento-Predictivo-Motores/
-│
-├── README.md
-├── requirements.txt
-├── .env.example
-├── backlog.csv
-│
 ├── docs/
-│ ├── arquitectura_explicacion.md
-│ └── diagramas/
+│   ├── Fase1_Anteproyecto.pdf
+│   ├── arquitectura_alto_nivel.png
+│   └── backlog_fase1.csv
 │
 ├── src/
-│ ├── ingest/
-│ ├── model/
-│ ├── api/
-│ └── dashboard/
+│   ├── README.md
+│   └── (vacío o notebooks de exploración inicial)
 │
-└── environment/
+├── environment/
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── README.md
+│
+├── .gitignore
+├── LICENSE
+├── README.md
+└── CONTRIBUTING.md
+```
 
 ## ⚙️ Instalación y ejecución 
 
@@ -58,7 +61,7 @@ Autores: Gabriel Guzmán Puras Ruiz, Alvaro Ruiz Vallejo y Pablo Ruz Muñoz
 
 Tutor: José Miguel Ruiz Guevara
 
-Institución: IFP - InNovación en Formación Profesional
+Institución: IFP - Innovación en Formación Profesional
 
 Año: 2025
 
