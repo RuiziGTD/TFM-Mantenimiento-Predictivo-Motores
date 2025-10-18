@@ -17,18 +17,18 @@ El proyecto utiliza el dataset **NASA C-MAPSS**, ampliamente reconocido en el á
 ```
 TFM-Mantenimiento-Predictivo-Motores/
 ├── docs/
+│   ├── README.md
 │   ├── Fase1_Anteproyecto.pdf
 │   ├── arquitectura_alto_nivel.png
 │   └── backlog_fase1.csv
 │
 ├── src/
 │   ├── README.md
-│   └── (vacío o notebooks de exploración inicial)
 │
 ├── environment/
+│   ├── README.md
 │   ├── requirements.txt
-│   ├── .env.example
-│   └── README.md
+│   └── .env.example
 │
 ├── .gitignore
 ├── LICENSE
