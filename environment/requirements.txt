@@ -1,0 +1,9 @@
+# Requisitos base para el proyecto
+numpy
+pandas
+scikit-learn
+matplotlib
+mlflow
+pymongo
+fastapi
+uvicorn  
