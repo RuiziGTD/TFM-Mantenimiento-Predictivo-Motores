@@ -1,4 +1,4 @@
-# Requisitos base para el proyecto
+# Requisitos base para el proyecto:
 numpy
 pandas
 scikit-learn
