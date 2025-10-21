@@ -20,8 +20,8 @@ Este documento describe las normas básicas para colaborar y mantener un flujo d
    ```bash
    git commit -m "feat: add data ingestion pipeline"
    ```
-4 **Si el cambio realiza cambios en la estructura del proyecto, realizar tambien cambios en los README.md necesarios**
-5 **Subir los cambios a la rama**
+4. **Si el cambio realiza cambios en la estructura del proyecto, realizar tambien cambios en los README.md necesarios**
+5. **Subir los cambios a la rama**
    ```bash
    git push origin feature/modelo-predictivo
    ```
@@ -30,18 +30,19 @@ Este documento describe las normas básicas para colaborar y mantener un flujo d
 
 ## ✍️ Formato commit
 
-El formato utilizado de cara a la realización de los commits será **Conventional Commits**
+El formato utilizado de cara a la realización de los commits será **Conventional Commits**:
 
-    Tipo      |               Descripción               
- -------------|-----------------------------------------
-   `feat`     | Nueva funcionalidad                     
-   `fix`      | Corrección de errores                   
-   `docs`     | Cambios en documentación                
-   `style`    | Cambios de formato o estilo             
-   `refactor` | Mejora interna sin cambiar la lógica    
-   `test`     | Tests añadidos o modificados            
-   `chore`    | Mantenimiento o tareas menores          
-   `init`     | Inicialización de proyecto o estructura 
+| Tipo       | Descripción                             |
+| ---------- | --------------------------------------- |
+| `feat`     | Nueva funcionalidad                     |
+| `fix`      | Corrección de errores                   |
+| `docs`     | Cambios en documentación                |
+| `style`    | Cambios de formato o estilo             |
+| `refactor` | Mejora interna sin cambiar la lógica    |
+| `test`     | Tests añadidos o modificados            |
+| `chore`    | Mantenimiento o tareas menores          |
+| `init`     | Inicialización de proyecto o estructura |
+
 
 Ejemplos de uso:
 
