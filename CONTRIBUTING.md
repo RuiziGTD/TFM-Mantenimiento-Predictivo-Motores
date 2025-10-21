@@ -43,15 +43,15 @@ El formato utilizado de cara a la realización de los commits será **Convention
 | `chore`    | Mantenimiento o tareas menores          |
 | `init`     | Inicialización de proyecto o estructura |
 
+Añadir tambien el número del issue al commit
 
-Ejemplos de uso:
+Ejemplos de commits:
 
 ```bash
-docs: add architecture diagram and explanation
-chore: add requirements.txt and environment setup
-feat: implement RUL model training pipeline
-fix: correct bug in preprocessing step
-
+docs (#12): add architecture diagram and explanation
+chore (#1): add requirements.txt and environment setup
+feat (#112): implement RUL model training pipeline
+fix (#92): correct bug in preprocessing step
 ```
 
 ---
