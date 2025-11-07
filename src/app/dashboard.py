@@ -5,7 +5,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title('Panel de Control de Salud de Motores ✈️')
+st.title('Panel de control de Salud de Motores - RUL ✈️')
 
 st.header("Estado General de la Flota")
 st.write("Aquí irá un resumen de los motores con RUL más bajo.")
