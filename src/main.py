@@ -1,4 +1,4 @@
-from src.pipeline.pipeline import run_pipeline
+from src.pipeline.pipeline import *
 
 open("logs/pipeline.log", "w").close()
 
