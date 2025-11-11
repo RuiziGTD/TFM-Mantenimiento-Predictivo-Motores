@@ -1,8 +1,12 @@
 from src.ingest.batch_ingest import load_batch
 from src.utils.logger import get_logger
 from src.processing.cleaning import *
-from config import *
+from dotenv import load_dotenv
+import os
 
+load_dotenv(dotenv_path="environment/.env")
+
+DATA_PATH_TRAIN_FD001 = os.getenv("DATA_PATH_TRAIN_FD001")
 logger = get_logger(__name__)
 
 def run_pipeline():
