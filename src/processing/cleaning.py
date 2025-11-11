@@ -1,5 +1,6 @@
 from src.utils.logger import get_logger  # Obtain logs
 import pandas as pd
+import os
 
 logger = get_logger(__name__)
 
@@ -25,31 +26,45 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-Carga un dataset CMAPSS de la NASA, identifica sensores irrelevantes 
-mediante la desviación estándar y devuelve los sensores útiles.
-"""
-def identificar_sensores_irrelevantes(df_train: pd.DataFrame):
-    sensor_columns = [
-        "T2", "T24", "T30", "T50", "P2", "P15",
-        "P30", "Nf", "Nc", "epr", "Ps30", "phi",
-        "NRf", "NRc", "BPR", "farB", "htBleed",
-        "Nf_dmd", "PCNfR_dmd", "W31", "W32"
-    ]
+def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str = "../output") -> pd.DataFrame:
+    # Cargar el archivo .txt
+    df_raw = pd.read_csv(path_txt, sep=" ", header=None)
+    df_raw.dropna(axis=1, how="all", inplace=True)  # Eliminar columnas vacías por separadores extra
 
-    sensor_std = df_train[sensor_columns].std()
-    logger.info("Desviación estándar de los sensores:\n" + sensor_std.to_string())
+    # Asignar nombres de columnas
+    df_named = assign_column_names(df_raw)
 
+    # Identificar sensores irrelevantes
+    sensor_columns = df_named.columns[5:]  # Los sensores empiezan en la columna 5
+    sensor_std = df_named[sensor_columns].std()
     sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
-    sensors_to_keep = [col for col in sensor_columns if col not in sensors_to_drop]
+    df_filtered = df_named.drop(columns=sensors_to_drop)
 
-    logger.info(f"Sensores a descartar ({len(sensors_to_drop)}): {sensors_to_drop}")
-    logger.info(f"Sensores a conservar ({len(sensors_to_keep)}): {sensors_to_keep}")
+    # Guardar el resultado
+    os.makedirs(output_dir, exist_ok=True)
+    filename = os.path.splitext(os.path.basename(path_txt))[0] + "_filtrado.csv"
+    output_path = os.path.join(output_dir, filename)
+    df_filtered.to_csv(output_path, index=False)
 
-    df_train_filtered = df_train.drop(columns=sensors_to_drop)
+    logger.info(f"Archivo filtrado guardado en: {output_path}")
+    logger.info(f"Sensores eliminados ({len(sensors_to_drop)}): {sensors_to_drop}")
+    return 
 
-    return {
-        "df_train": df_train_filtered,
-        "sensors_to_drop": sensors_to_drop,
-        "sensors_to_keep": sensors_to_keep
-    }
+def procesar_varios_archivos_txt(lista_rutas: list[str], output_dir: str = "../output") -> list[pd.DataFrame]:
+    """
+    Itera sobre una lista de rutas de archivos .txt, aplica el filtrado de sensores irrelevantes
+    y guarda cada resultado como .csv en la carpeta de salida.
+    Devuelve una lista de DataFrames filtrados.
+    """
+    resultados = []
+
+    for ruta in lista_rutas:
+        try:
+            logger.info(f"Procesando archivo: {ruta}")
+            df_filtrado = identificar_sensores_irrelevantes_y_guardar(ruta, output_dir)
+            resultados.append(df_filtrado)
+        except Exception as e:
+            logger.error(f"Error al procesar {ruta}: {e}")
+
+    logger.info(f"Procesamiento completado para {len(resultados)} archivos.")
+    return resultados
