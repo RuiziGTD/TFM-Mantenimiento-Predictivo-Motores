@@ -40,6 +40,9 @@ def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str =
     sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
     df_filtered = df_named.drop(columns=sensors_to_drop)
 
+    # Añadir columna RUL
+    df_filtered = calcular_rul(df_filtered)
+
     # Guardar el resultado
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.splitext(os.path.basename(path_txt))[0] + "_filtrado.csv"
@@ -68,3 +71,15 @@ def procesar_varios_archivos_txt(lista_rutas: list[str], output_dir: str = "../o
 
     logger.info(f"Procesamiento completado para {len(resultados)} archivos.")
     return resultados
+
+def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Añade la columna 'RUL' al DataFrame de entrenamiento.
+    Calcula el RUL como la diferencia entre el ciclo final y el ciclo actual.
+    """
+    max_cycles = df.groupby("unit_number")["time_in_cycles"].max()
+    df = df.merge(max_cycles.rename("max_cycle"), on="unit_number")
+    df["RUL"] = df["max_cycle"] - df["time_in_cycles"]
+    df.drop(columns=["max_cycle"], inplace=True)
+    logger.info("Columna RUL añadida correctamente al dataset.")
+    return df

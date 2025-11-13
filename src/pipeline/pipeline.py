@@ -2,6 +2,7 @@ from src.ingest.batch_ingest import load_batch
 from src.utils.logger import get_logger
 from src.processing.cleaning import *
 from dotenv import load_dotenv
+from config import *
 import os
 
 load_dotenv(dotenv_path="environment/.env")
