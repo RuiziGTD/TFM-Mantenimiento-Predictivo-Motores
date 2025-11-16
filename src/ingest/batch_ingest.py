@@ -1,26 +1,24 @@
 import pandas as pd
 from src.utils.logger import get_logger  # Obtain logs
+from src.processing.cleaning import identificar_sensores_irrelevantes_y_guardar
 
 logger = get_logger(__name__)
 
-def load_batch(input_path: str) -> pd.DataFrame:
-    logger.info(f"Cargando datos desde {input_path}")
-    try:
-        df = pd.read_csv(input_path, 
-                         sep='\s+', 
-                         header=None)
-    except FileNotFoundError:
-        logger.error(f"No se encontró el archivo: {input_path}")
-        raise ValueError(f"El archivo {input_path} está vacío o corrupto.") from None
-    except Exception as e: 
-        logger.error(f"Error desconocido al cargar los datos")
-        raise ValueError(f"Error desconocido al cargar los datos") from None
+def procesar_varios_archivos(spark, lista_rutas: list[str], output_dir: str = "../output") -> list[pd.DataFrame]:
+    """
+    Itera sobre una lista de rutas de archivos .txt, aplica el filtrado de sensores irrelevantes
+    y guarda cada resultado como .csv en la carpeta de salida.
+    Devuelve una lista de DataFrames filtrados.
+    """
+    resultados = []
 
-    if df.empty:
-        logger.error("El dataset está vacío.")
-        raise ValueError("El dataset está vacío")
+    for ruta in lista_rutas:
+        try:
+            logger.info(f"Procesando archivo: {ruta}")
+            df_filtrado = identificar_sensores_irrelevantes_y_guardar(spark, ruta, output_dir)
+            resultados.append(df_filtrado)
+        except Exception as e:
+            logger.error(f"Error al procesar {ruta}: {e}")
 
-    logger.info(f"{len(df)} filas cargadas correctamente")
-    logger.info(f"Vista previa del dataset:\n{df.head().to_string(index=False)}")
-
-    return df
+    logger.info(f"Procesamiento completado para {len(resultados)} archivos.")
+    return resultados
