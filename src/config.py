@@ -29,3 +29,6 @@ DATA_PATHS_TRAIN = [
     DATA_PATH_TRAIN_FD003,
     DATA_PATH_TRAIN_FD004
 ]
+
+CSV_OUTPUT = "output/output_csv"
+PARQUET_OUTPUT = "output/output_parquet"
