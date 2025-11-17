@@ -53,7 +53,8 @@ def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir
     logger.info(f"Archivo filtrado en CSV guardado en: {output_path}")
     logger.info(f"Sensores eliminados ({len(sensors_to_drop)}): {sensors_to_drop}")
 
-    spark_data_lake(spark, df_filtered, path_txt)
+    if spark:
+        spark_data_lake(spark, df_filtered, path_txt)
     return 
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
