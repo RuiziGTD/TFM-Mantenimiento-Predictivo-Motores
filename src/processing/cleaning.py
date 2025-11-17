@@ -1,4 +1,5 @@
 from src.utils.logger import get_logger  # Obtain logs
+from src.processing.spark import spark_data_lake
 import pandas as pd
 import os
 
@@ -26,7 +27,7 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str = "../output/data_test") -> pd.DataFrame:
+def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir: str = "../output") -> pd.DataFrame:
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
     df_raw.dropna(axis=1, how="all", inplace=True)  # Eliminar columnas vacías por separadores extra
@@ -49,28 +50,13 @@ def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str =
     output_path = os.path.join(output_dir, filename)
     df_filtered.to_csv(output_path, index=False)
 
-    logger.info(f"Archivo filtrado guardado en: {output_path}")
+    logger.info(f"Archivo filtrado en CSV guardado en: {output_path}")
     logger.info(f"Sensores eliminados ({len(sensors_to_drop)}): {sensors_to_drop}")
+
+    if spark:
+        spark_data_lake(spark, df_filtered, path_txt)
     return 
 
-def procesar_varios_archivos_txt(lista_rutas: list[str], output_dir: str = "../output/data_test") -> list[pd.DataFrame]:
-    """
-    Itera sobre una lista de rutas de archivos .txt, aplica el filtrado de sensores irrelevantes
-    y guarda cada resultado como .csv en la carpeta de salida.
-    Devuelve una lista de DataFrames filtrados.
-    """
-    resultados = []
-
-    for ruta in lista_rutas:
-        try:
-            logger.info(f"Procesando archivo: {ruta}")
-            df_filtrado = identificar_sensores_irrelevantes_y_guardar(ruta, output_dir)
-            resultados.append(df_filtrado)
-        except Exception as e:
-            logger.error(f"Error al procesar {ruta}: {e}")
-
-    logger.info(f"Procesamiento completado para {len(resultados)} archivos.")
-    return resultados
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
     """
