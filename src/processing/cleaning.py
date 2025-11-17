@@ -26,7 +26,7 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str = "../output") -> pd.DataFrame:
+def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str = "../output/data_test") -> pd.DataFrame:
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
     df_raw.dropna(axis=1, how="all", inplace=True)  # Eliminar columnas vacías por separadores extra
@@ -41,7 +41,7 @@ def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str =
     df_filtered = df_named.drop(columns=sensors_to_drop)
 
     # Añadir columna RUL
-    df_filtered = calcular_rul(df_filtered)
+    #df_filtered = calcular_rul(df_filtered)
 
     # Guardar el resultado
     os.makedirs(output_dir, exist_ok=True)
@@ -53,7 +53,7 @@ def identificar_sensores_irrelevantes_y_guardar(path_txt: str, output_dir: str =
     logger.info(f"Sensores eliminados ({len(sensors_to_drop)}): {sensors_to_drop}")
     return 
 
-def procesar_varios_archivos_txt(lista_rutas: list[str], output_dir: str = "../output") -> list[pd.DataFrame]:
+def procesar_varios_archivos_txt(lista_rutas: list[str], output_dir: str = "../output/data_test") -> list[pd.DataFrame]:
     """
     Itera sobre una lista de rutas de archivos .txt, aplica el filtrado de sensores irrelevantes
     y guarda cada resultado como .csv en la carpeta de salida.

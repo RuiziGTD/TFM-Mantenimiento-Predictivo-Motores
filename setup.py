@@ -12,6 +12,8 @@ setup(
         "numpy", 
         "scikit-learn",
         "matplotlib",
+        "python-dotenv",
+        "tensorflow",
         # añade otras que uses
     ],
     python_requires=">=3.7",
