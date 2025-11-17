@@ -15,26 +15,23 @@ def run_pipeline(spark):
     Procesa, filtra sensores irrelevantes y guarda los resultados en CSV.
     """
 
-    """
-    if not os.path.isdir(CARPETA_OUTPUT):
-        print("❌ El directorio no existe.")
-        return
-    
-    archivos = os.listdir(CARPETA_OUTPUT)
-    
-    # Si hay archivos, no ejecuta la función pipeline.
-    if archivos:
-        print("⚠️ El directorio tiene archivos, no se ejecuta la función Pipeline.")
-        return None
-    """
-    
+    # Validación opcional del directorio de salida
+    # if not os.path.isdir(CARPETA_OUTPUT):
+    #     print("   El directorio no existe.")
+    #     return None
+    #
+    # archivos = os.listdir(CARPETA_OUTPUT)
+    # if archivos:
+    #     print("   El directorio tiene archivos, no se ejecuta la función Pipeline.")
+    #     return None
+
     try:
-		resultados = procesar_varios_archivos(spark, DATA_PATHS_TRAIN, CSV_OUTPUT)
+        resultados = procesar_varios_archivos(spark, DATA_PATHS_TRAIN, CSV_OUTPUT)
         logger.info("Pipeline ejecutado correctamente sobre todos los archivos.")
     except Exception as e:
         logger.error(f"Error en el pipeline: {e}")
         print("Error en el pipeline. Revisar logs/pipeline.log para más detalles.")
-        return
+        return None
 
     print("\nPipeline completado correctamente.")
     return resultados
