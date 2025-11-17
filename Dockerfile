@@ -5,8 +5,8 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # 3. Copiar y instalar requisitos
-COPY environment/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY environment/requirements_docker.txt .
+RUN pip install --no-cache-dir -r requirements_docker.txt
 
 # 4. Copiar todo el código fuente
 COPY ./src /app/src

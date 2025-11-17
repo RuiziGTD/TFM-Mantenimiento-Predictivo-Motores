@@ -1,0 +1,43 @@
+name: Proyecto CI (Pruebas y Calidad)
+
+on:
+  # Ejecuta este workflow en cada push a la rama compartida
+  push:
+    branches:
+      - "#1_pipeline"
+  # Y también en cada Pull Request hacia 'main'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Usará un servidor Linux
+
+    steps:
+      # 1. Descarga el código del repositorio
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Configura Python (usamos 3.12 como en el Dockerfile)
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 3. Instala las dependencias
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r environment/requirements.txt
+
+      # 4. Comprobar el estilo (Linter)
+      - name: Comprobar estilo con Flake8
+        run: |
+          pip install flake8
+          flake8 src/
+
+      # 5. Ejecutar las pruebas unitarias (El paso clave)
+      - name: Ejecutar Pytest
+        run: |
+          python -m pytest
