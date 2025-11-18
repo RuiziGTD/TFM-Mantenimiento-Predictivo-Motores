@@ -24,30 +24,26 @@ def spark_init():
 
     return spark
 
-
 def scale_group(group, sensor_cols):
     """Escala los sensores de un motor usando StandardScaler"""
     scaler = StandardScaler()
     group[sensor_cols] = scaler.fit_transform(group[sensor_cols])
     return group
 
-
 def normalize_per_engine(spark, df: pd.DataFrame):
+
     """Normalizar los valores de los sensores por motor, para facilitar el entendimiento del modelo"""
     sensor_columns = df.columns[5:]  # Los sensores empiezan en la columna 6
     # Aplica la normalización por motor
-    df_scaled = df.groupby("unit_number").apply(
-        lambda g: scale_group(g, sensor_columns)
-    )
+    df_scaled = df.groupby("unit_number").apply(lambda g: scale_group(g, sensor_columns))
 
     # Convierte a Spark DataFrame
     spark_df = spark.createDataFrame(df_scaled)
     return spark_df
 
-
 def spark_data_lake(spark, df: pd.DataFrame, path_txt: str):
 
-    spark_df = normalize_per_engine(spark, df)
+    spark_df = spark.createDataFrame(df)
 
     os.makedirs(PARQUET_OUTPUT, exist_ok=True)
 

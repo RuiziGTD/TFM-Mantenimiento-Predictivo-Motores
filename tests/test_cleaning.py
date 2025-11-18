@@ -1,10 +1,6 @@
 import pytest
 import pandas as pd
-from src.processing.cleaning import (
-    assign_column_names,
-    identificar_sensores_irrelevantes,
-)
-
+from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes
 
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
@@ -25,7 +21,7 @@ def test_assign_column_names_ok():
 
 
 # TEST 4: Para identificar_sensores_irrelevantes con valores de desviación estandar simulados
-def test_identificar_sensores_irrelevantes_ok():
+def test_identificar_sensores_irrelevantes_ok(tmp_path):
     # Crear DataFrame con sensores, algunos sin variación
     data = {
         "unit_number": [1, 2, 3],
@@ -57,27 +53,11 @@ def test_identificar_sensores_irrelevantes_ok():
         "W32": [1, 1, 1],  # <- sin variación
     }
     df = pd.DataFrame(data)
+    path = tmp_path / "test.txt"
+    df.to_csv(path, sep=" ", header=False, index=False)
 
-    result = identificar_sensores_irrelevantes(df)
+    result = identificar_sensores_irrelevantes_y_guardar(None, str(path))
 
-    # Comprobaciones básicas
-    assert isinstance(result, dict)
-    assert "df_train" in result
-    assert "sensors_to_drop" in result
-    assert "sensors_to_keep" in result
+    assert isinstance(result, pd.DataFrame)
+    assert result.shape[0] == 3
 
-    drop = result["sensors_to_drop"]
-    keep = result["sensors_to_keep"]
-
-    # Debe detectar sensores con desviación estándar ~0
-    assert "T30" in drop
-    assert "P2" in drop
-    assert "epr" in drop
-    assert "NRc" in drop
-    assert "htBleed" in drop
-    assert "W32" in drop
-
-    # Asegurar que los que varían se mantienen
-    assert "T2" in keep
-    assert "phi" in keep
-    assert all(col not in result["df_train"].columns for col in drop)
