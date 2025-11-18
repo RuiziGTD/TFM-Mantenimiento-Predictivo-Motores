@@ -9,6 +9,9 @@ DATA_DIR = os.path.join(BASE_DIR, "data", "raw_data")
 # Carpeta donde están los datos filtrados csv
 DATA_DIR_FILTRADO = os.path.join(BASE_DIR, "output")
 
+CARPETA_OUTPUT_CSV = os.path.join(BASE_DIR, "output/output_csv")
+CARPETA_OUTPUT_DATA_TEST = os.path.join(BASE_DIR, "output/data_test")
+
 # Rutas individuales
 DATA_PATH_TRAIN_FD001 = os.path.join(DATA_DIR, "train_FD001.txt")
 DATA_PATH_TRAIN_FD002 = os.path.join(DATA_DIR, "train_FD002.txt")

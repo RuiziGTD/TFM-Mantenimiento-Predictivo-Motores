@@ -14,6 +14,7 @@ setup(
         "matplotlib",
         "python-dotenv",
         "tensorflow",
+        "pyspark",
         # añade otras que uses
     ],
     python_requires=">=3.7",

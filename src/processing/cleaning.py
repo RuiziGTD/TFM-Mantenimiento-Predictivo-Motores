@@ -30,19 +30,21 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
 def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir: str = "../output") -> pd.DataFrame:
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
-    df_raw.dropna(axis=1, how="all", inplace=True)  # Eliminar columnas vacías por separadores extra
+    df_raw.dropna(axis=1, how="all", inplace=True)
 
     # Asignar nombres de columnas
     df_named = assign_column_names(df_raw)
 
     # Identificar sensores irrelevantes
-    sensor_columns = df_named.columns[5:]  # Los sensores empiezan en la columna 5
+    sensor_columns = df_named.columns[5:]
     sensor_std = df_named[sensor_columns].std()
     sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
     df_filtered = df_named.drop(columns=sensors_to_drop)
 
-    # Añadir columna RUL
-    #df_filtered = calcular_rul(df_filtered)
+    # Añadir columna RUL solo si el archivo contiene "train"
+    filename_raw = os.path.basename(path_txt).lower()
+    if "train" in filename_raw:
+        df_filtered = calcular_rul(df_filtered)
 
     # Guardar el resultado
     os.makedirs(output_dir, exist_ok=True)
@@ -55,8 +57,8 @@ def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir
 
     if spark:
         spark_data_lake(spark, df_filtered, path_txt)
-    return 
 
+    return df_filtered
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
     """

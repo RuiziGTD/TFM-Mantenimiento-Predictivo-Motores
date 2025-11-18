@@ -1,6 +1,6 @@
 import pandas as pd
 from src.utils.logger import get_logger  # Obtain logs
-from src.processing.cleaning import identificar_sensores_irrelevantes_y_guardar
+from src.processing.cleaning import *
 
 logger = get_logger(__name__)
 
