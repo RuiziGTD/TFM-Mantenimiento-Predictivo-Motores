@@ -60,4 +60,13 @@ def test_identificar_sensores_irrelevantes_ok(tmp_path):
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
+    irrelevantes = ["T30", "P2", "epr", "NRc", "htBleed", "W32"]
+
+    for col in irrelevantes:
+        assert col not in result.columns, f"{col} debería haber sido eliminado"
+
+    # Y opcional: comprobar que alguno relevante siga presente
+    relevantes = ["T2", "T24", "T50", "P15"]
+    for col in relevantes:
+        assert col in result.columns, f"{col} no debería eliminarse"
 
