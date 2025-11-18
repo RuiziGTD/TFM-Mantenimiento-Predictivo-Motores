@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes
+from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes_y_guardar
 
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
