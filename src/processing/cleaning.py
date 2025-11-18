@@ -81,7 +81,7 @@ def identificar_sensores_irrelevantes_y_guardar(
 
     if spark:
         spark_data_lake(spark, df_filtered, path_txt)
-    return 
+    return
 
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:

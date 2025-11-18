@@ -17,6 +17,6 @@ def test_run_pipeline(monkeypatch, tmp_path):
     assert isinstance(result, list)
     assert len(result) > 0
     assert isinstance(result[0], pd.DataFrame)
-    assert all(col in result[0].columns for col in ["unit_number", "time_in_cycles", "RUL"])
-
-
+    assert all(
+        col in result[0].columns for col in ["unit_number", "time_in_cycles", "RUL"]
+    )
