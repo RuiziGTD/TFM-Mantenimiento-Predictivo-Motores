@@ -4,19 +4,30 @@ from src.processing.cleaning import *
 
 logger = get_logger(__name__)
 
-def procesar_varios_archivos(spark, lista_rutas: list[str], output_dir: str = "../output") -> list[pd.DataFrame]:
+def procesar_varios_archivos(spark, lista_rutas: list[str], CARPETA_OUTPUT_CSV: str, CARPETA_OUTPUT_DATA_TEST: str
+) -> list[pd.DataFrame]:
+    
     """
     Itera sobre una lista de rutas de archivos .txt, aplica el filtrado de sensores irrelevantes
-    y guarda cada resultado como .csv en la carpeta de salida.
+    y guarda cada resultado en la carpeta correcta (train → CARPETA_OUTPUT_CSV, test → CARPETA_OUTPUT_DATA_TEST).
     Devuelve una lista de DataFrames filtrados.
     """
+    
     resultados = []
 
     for ruta in lista_rutas:
         try:
             logger.info(f"Procesando archivo: {ruta}")
-            df_filtrado = identificar_sensores_irrelevantes_y_guardar(spark, ruta, output_dir)
+
+            df_filtrado = identificar_sensores_irrelevantes_y_guardar(
+                spark,
+                ruta,
+                CARPETA_OUTPUT_CSV,
+                CARPETA_OUTPUT_DATA_TEST
+            )
+
             resultados.append(df_filtrado)
+
         except Exception as e:
             logger.error(f"Error al procesar {ruta}: {e}")
 

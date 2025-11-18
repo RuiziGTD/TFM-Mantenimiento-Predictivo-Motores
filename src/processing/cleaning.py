@@ -27,7 +27,13 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir: str = "../output") -> pd.DataFrame:
+def identificar_sensores_irrelevantes_y_guardar(
+    spark,
+    path_txt: str,
+    CARPETA_OUTPUT_CSV: str,
+    CARPETA_OUTPUT_DATA_TEST: str
+) -> pd.DataFrame:
+
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
     df_raw.dropna(axis=1, how="all", inplace=True)
@@ -41,24 +47,40 @@ def identificar_sensores_irrelevantes_y_guardar(spark, path_txt: str, output_dir
     sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
     df_filtered = df_named.drop(columns=sensors_to_drop)
 
-    # Añadir columna RUL solo si el archivo contiene "train"
+    # Detectar tipo de archivo por nombre
     filename_raw = os.path.basename(path_txt).lower()
+
+    # Añadir columna RUL solo para train
     if "train" in filename_raw:
         df_filtered = calcular_rul(df_filtered)
 
-    # Guardar el resultado
+    # Seleccionar carpeta de salida
+    if "train" in filename_raw:
+        output_dir = CARPETA_OUTPUT_CSV
+    elif "test" in filename_raw:
+        output_dir = CARPETA_OUTPUT_DATA_TEST
+    else:
+        raise ValueError(f"No se reconoce si el archivo es train o test: {filename_raw}")
+
+    # Crear carpeta si no existe
     os.makedirs(output_dir, exist_ok=True)
+
+    # Generar nombre del archivo
     filename = os.path.splitext(os.path.basename(path_txt))[0] + "_filtrado.csv"
     output_path = os.path.join(output_dir, filename)
+
+    # Guardar archivo
     df_filtered.to_csv(output_path, index=False)
 
     logger.info(f"Archivo filtrado en CSV guardado en: {output_path}")
     logger.info(f"Sensores eliminados ({len(sensors_to_drop)}): {sensors_to_drop}")
 
+    # Cargar en Spark si corresponde
     if spark:
         spark_data_lake(spark, df_filtered, path_txt)
 
     return df_filtered
+
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
     """

@@ -16,9 +16,12 @@ if __name__ == "__main__":
             print("Caracter no reconocido, por favor responda usando 'y' en caso afirmativo o 'n' en caso negativo")
 
     spark = spark_init() if choice == "y" else None
-    #run_pipeline(spark)
+
+    run_pipeline(spark)
+    
     if spark:
         spark.stop()
+
 
 """ MODELO 1
 resultados = train_autoencoder_rul(
@@ -51,7 +54,7 @@ print("Columnas usadas en el modelo:", resultados["features_used"])
 
 """
 
-
+"""
 resultados_fd002 = train_lstm_rul(
     train_path="../output/output_csv/train_FD002_filtrado.csv",
     test_path="../output/data_test/test_FD002_filtrado.csv",
@@ -62,3 +65,4 @@ resultados_fd002 = train_lstm_rul(
 
 print("\nPredicciones FD002 (primeras filas):")
 print(resultados_fd002["predicciones"].head())
+"""
