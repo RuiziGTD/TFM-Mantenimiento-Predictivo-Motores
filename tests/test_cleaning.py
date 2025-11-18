@@ -1,6 +1,9 @@
 import pytest
 import pandas as pd
-from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes_y_guardar
+from src.processing.cleaning import (
+    assign_column_names,
+    identificar_sensores_irrelevantes_y_guardar,
+)
 
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
@@ -69,4 +72,3 @@ def test_identificar_sensores_irrelevantes_ok(tmp_path):
     relevantes = ["T2", "T24", "T50", "P15"]
     for col in relevantes:
         assert col in result.columns, f"{col} no debería eliminarse"
-

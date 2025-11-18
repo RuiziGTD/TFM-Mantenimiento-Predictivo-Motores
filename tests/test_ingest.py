@@ -17,5 +17,3 @@ def test_procesar_varios_archivos_ok(tmp_path):
     assert len(resultados) == 1
     assert isinstance(resultados[0], pd.DataFrame)
     assert resultados[0].shape[0] == 2
-
-

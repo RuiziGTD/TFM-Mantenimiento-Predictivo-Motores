@@ -2,13 +2,16 @@ from unittest.mock import patch, MagicMock
 from src.processing.spark import spark_data_lake, spark_init
 import pytest
 
+
 def test_spark_init_integration():
     spark = spark_init()
     assert spark is not None
     assert spark.version  # Comprobación mínima
     spark.stop()
 
+
 from src.config import PARQUET_OUTPUT
+
 
 def test_spark_data_lake():
     # MagicMock sirve para simular un objeto que originalmente necesitaria el lanzamiento de un servicio
@@ -20,10 +23,11 @@ def test_spark_data_lake():
     df = MagicMock()
     path_txt = "input/cars.txt"
 
-    with patch("os.makedirs") as mock_makedirs, \
-         patch("os.path.splitext", return_value=("cars", ".txt")), \
-         patch("os.path.basename", return_value="cars.txt"), \
-         patch("os.path.join", return_value=f"{PARQUET_OUTPUT}/cars_parquet"):
+    with patch("os.makedirs") as mock_makedirs, patch(
+        "os.path.splitext", return_value=("cars", ".txt")
+    ), patch("os.path.basename", return_value="cars.txt"), patch(
+        "os.path.join", return_value=f"{PARQUET_OUTPUT}/cars_parquet"
+    ):
 
         spark_data_lake(spark, df, path_txt)
 

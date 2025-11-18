@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from src.utils.logger import get_logger
 
+
 def test_get_logger(tmp_path, monkeypatch):
     # Redirigir el directorio logs al temp
     monkeypatch.chdir(tmp_path)
