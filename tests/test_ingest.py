@@ -4,6 +4,7 @@ from src.ingest.batch_ingest import load_batch
 import pandas as pd
 import tempfile, os, pytest
 
+
 def test_load_batch_ok():
     data = "1 2 3\n4 5 6"
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:

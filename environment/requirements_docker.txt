@@ -16,3 +16,4 @@ matplotlib
 # Pruebas
 pytest
 httpx
+black

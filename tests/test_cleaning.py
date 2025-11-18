@@ -1,6 +1,10 @@
 import pytest
 import pandas as pd
-from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes
+from src.processing.cleaning import (
+    assign_column_names,
+    identificar_sensores_irrelevantes,
+)
+
 
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
@@ -32,25 +36,25 @@ def test_identificar_sensores_irrelevantes_ok():
         # sensores relevantes (varían)
         "T2": [1, 2, 3],
         "T24": [10, 20, 30],
-        "T30": [5, 5, 5],     # <- sin variación
+        "T30": [5, 5, 5],  # <- sin variación
         "T50": [2, 3, 4],
-        "P2": [1.0, 1.0, 1.0], # <- sin variación
+        "P2": [1.0, 1.0, 1.0],  # <- sin variación
         "P15": [2, 2.1, 2.2],
         "P30": [3, 4, 5],
         "Nf": [6, 7, 8],
         "Nc": [9, 10, 11],
-        "epr": [1, 1, 1],     # <- sin variación
+        "epr": [1, 1, 1],  # <- sin variación
         "Ps30": [2, 3, 2.5],
         "phi": [0.1, 0.2, 0.3],
         "NRf": [100, 101, 99],
-        "NRc": [200, 200, 200], # <- sin variación
+        "NRc": [200, 200, 200],  # <- sin variación
         "BPR": [0.5, 0.6, 0.7],
         "farB": [0.8, 0.9, 1.0],
-        "htBleed": [0.0, 0.0, 0.0], # <- sin variación
+        "htBleed": [0.0, 0.0, 0.0],  # <- sin variación
         "Nf_dmd": [5, 6, 7],
         "PCNfR_dmd": [7, 8, 9],
         "W31": [1, 2, 3],
-        "W32": [1, 1, 1], # <- sin variación
+        "W32": [1, 1, 1],  # <- sin variación
     }
     df = pd.DataFrame(data)
 

@@ -4,6 +4,7 @@ from src.pipeline.pipeline import run_pipeline
 import pytest
 import os
 
+
 def test_run_pipeline(monkeypatch, tmp_path):
     # Simular variable de entorno
     fake_file = tmp_path / "fake.csv"

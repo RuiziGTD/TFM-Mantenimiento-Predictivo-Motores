@@ -9,6 +9,7 @@ load_dotenv(dotenv_path="environment/.env")
 DATA_PATH_TRAIN_FD001 = os.getenv("DATA_PATH_TRAIN_FD001")
 logger = get_logger(__name__)
 
+
 def run_pipeline(spark):
     """
     Ejecuta el pipeline completo sobre una lista de archivos .txt CMAPSS.
@@ -24,4 +25,3 @@ def run_pipeline(spark):
 
     print("\nPipeline completado correctamente.")
     return resultados
-
