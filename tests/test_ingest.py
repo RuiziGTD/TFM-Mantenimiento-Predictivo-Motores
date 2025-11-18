@@ -4,6 +4,7 @@ from src.ingest.batch_ingest import procesar_varios_archivos
 import pandas as pd
 import tempfile, os, pytest
 
+
 def test_procesar_varios_archivos_ok(tmp_path):
     data = " ".join(["1"] * 26) + "\n" + " ".join(["2"] * 26)
 

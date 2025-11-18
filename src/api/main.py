@@ -4,8 +4,9 @@ from fastapi import FastAPI
 app = FastAPI(
     title="API de Mantenimiento Predictivo",
     description="Sirve predicciones de RUL (Vida Útil Restante) para motores de avión.",
-    version="0.1.0"
+    version="0.1.0",
 )
+
 
 @app.get("/health", tags=["Monitoring"])
 def get_health():
@@ -14,6 +15,7 @@ def get_health():
     Verifica que la API está operativa.
     """
     return {"status": "ok"}
+
 
 # En el futuro (Fase 3), aquí añadiremos el endpoint de predicción
 # @app.post("/predict", tags=["Prediction"])

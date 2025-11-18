@@ -4,6 +4,7 @@ from src.pipeline.pipeline import run_pipeline
 import pytest, os
 import pandas as pd
 
+
 def test_run_pipeline(monkeypatch, tmp_path):
     file = tmp_path / "fake.csv"
     file.write_text(" ".join(["1"] * 26) + "\n" + " ".join(["2"] * 26))
