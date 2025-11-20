@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from src.utils.logger import get_logger
 
+# TEST 5: Test que comprueba la correcta creación de un archivo .log
 
 def test_get_logger(tmp_path, monkeypatch):
     # Redirigir el directorio logs al temp

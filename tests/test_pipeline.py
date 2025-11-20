@@ -1,9 +1,8 @@
-# TEST 1: Testear la carga de datos con un dataset inventado
-
 from src.pipeline.pipeline import run_pipeline
 import pytest, os
 import pandas as pd
 
+# TEST 1: Testear la carga de datos con un dataset inventado
 
 def test_run_pipeline(monkeypatch, tmp_path):
     file = tmp_path / "fake.csv"

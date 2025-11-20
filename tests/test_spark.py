@@ -2,6 +2,7 @@ from unittest.mock import patch, MagicMock
 from src.processing.spark import spark_data_lake, spark_init
 import pytest
 
+# TEST 9: Comprobar el correcto funcionamiento del inició de sesión Spark
 
 def test_spark_init_integration():
     spark = spark_init()
@@ -12,6 +13,7 @@ def test_spark_init_integration():
 
 from src.config import PARQUET_OUTPUT
 
+# TEST 10: Comprobar la creación de un datalake con un objeto simulando un dataframe spark
 
 def test_spark_data_lake():
     # MagicMock sirve para simular un objeto que originalmente necesitaria el lanzamiento de un servicio
