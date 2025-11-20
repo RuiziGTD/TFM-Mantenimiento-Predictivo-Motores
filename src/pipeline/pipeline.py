@@ -18,6 +18,11 @@ def run_pipeline(spark):
     # Directorios de salida
     directorios = [CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST]
 
+    for carpeta in directorios:
+        if not os.path.isdir(carpeta):
+            os.makedirs(carpeta, exist_ok=True)
+            logger.info(f"Carpeta creada: {carpeta}")
+            
     # Verificar si hay archivos en alguna carpeta de salida
     for carpeta in directorios:
         if os.path.isdir(carpeta):
