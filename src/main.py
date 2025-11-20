@@ -4,6 +4,7 @@ from src.modelo_ia.modelo_prueba_3 import *
 from src.config import *
 from src.processing.spark import *
 
+
 open("logs/pipeline.log", "w").close()
 
 if __name__ == "__main__":
@@ -22,8 +23,6 @@ if __name__ == "__main__":
     if spark:
         spark.stop()
 
-
-
 resultados = train_lstm_rul(
     train_path=[
         "output/output_csv/train_FD001_filtrado.csv",
@@ -36,8 +35,12 @@ resultados = train_lstm_rul(
     epochs=200
 )
 
-for dataset, m in resultados["metrics"].items():
-    print(f"Dataset {dataset} -> MSE: {m['MSE']:.2f}, R2: {m['R2']:.3f}")
+m = resultados['metrics']
+print(f"MSE: {m['MSE']:.2f}, RMSE: {m['RMSE']:.2f}, R2: {m['R2']:.3f}, NASA_Score: {m['NASA_Score']:.3f}")
+
+# Acceder a las predicciones
+df_pred = resultados['predicciones']
+print(df_pred.head())
 
 
 """

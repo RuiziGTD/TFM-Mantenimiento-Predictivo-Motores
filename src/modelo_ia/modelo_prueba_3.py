@@ -3,8 +3,11 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
+from tensorflow.keras.models import load_model
+import os
 
 def train_lstm_rul(train_path, test_path, rul_path,
                    sequence_length=50, epochs=200, batch_size=64,
@@ -19,7 +22,6 @@ def train_lstm_rul(train_path, test_path, rul_path,
 
     # --- 1. Definir columnas ---
     feature_cols = [
-        "time_in_cycles",
         "op_setting_1","op_setting_2","op_setting_3",
         "T24","T30","T50","P30","Nf","Nc","Ps30","phi",
         "NRf","NRc","BPR","htBleed","W31","W32"
@@ -61,88 +63,124 @@ def train_lstm_rul(train_path, test_path, rul_path,
     df_train["RUL"] = df_train["RUL"].clip(upper=max_rul_cap)
 
     # --- 4. Crear secuencias para train ---
-    def create_sequences(df, seq_len):
+    def create_sequences_with_padding(df, seq_len, feature_cols):
         X, y = [], []
+        groups = []  # Para cada secuencia, almacenamos su unidad
         for unit in df["unit_number"].unique():
             unit_data = df[df["unit_number"] == unit]
-            unit_features = unit_data[feature_cols].values
-            unit_rul = unit_data["RUL"].values
+            feats = unit_data[feature_cols].values
+            rul = unit_data["RUL"].values
+            L = len(feats)
+            # Generar secuencias desde longitud 1 hasta L
+            for i in range(1, L+1):
+                start = max(0, i - seq_len)
+                seq = feats[start:i]
+                if len(seq) < seq_len:
+                    pad = np.zeros((seq_len - len(seq), seq.shape[1]))
+                    seq = np.vstack([pad, seq])
+                X.append(seq)
+                y.append(rul[i-1])
+                groups.append(unit)
+        return np.array(X), np.array(y), np.array(groups)
 
-            for i in range(len(unit_features) - seq_len + 1):
-                X.append(unit_features[i:i+seq_len])
-                y.append(unit_rul[i+seq_len-1])
-        return np.array(X), np.array(y)
+    X_train_seq, y_train_seq, groups_train = create_sequences_with_padding(df_train, sequence_length, feature_cols)
 
-    X_train_seq, y_train_seq = create_sequences(df_train, sequence_length)
+    # Agrupar por unit number, que coga toda la secuencia de un motor
+
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.1, random_state=42)
+    train_idx, val_idx = next(gss.split(X_train_seq, y_train_seq, groups_train))
+
+    X_tr, X_val = X_train_seq[train_idx], X_train_seq[val_idx]
+    y_tr, y_val = y_train_seq[train_idx], y_train_seq[val_idx]
 
     # --- 5. Definir modelo LSTM ---
-    model = models.Sequential([ 
-        layers.Masking(mask_value=0., input_shape=(sequence_length, len(feature_cols))), 
-        layers.LSTM(128, return_sequences=True), 
-        layers.Dropout(0.2), 
-        layers.LSTM(64), 
-        layers.Dropout(0.2), 
-        layers.Dense(32, activation="relu"), 
-        layers.Dense(1)])
+    model = models.Sequential([
+        layers.Masking(mask_value=0., input_shape=(sequence_length, len(feature_cols))),
+        layers.LSTM(128, return_sequences=True),
+        layers.BatchNormalization(),
+        layers.Dropout(0.2),
+        layers.LSTM(64),
+        layers.BatchNormalization(),
+        layers.Dropout(0.2),
+        layers.Dense(32, activation="relu"),
+        layers.Dense(1)
+    ])
     model.compile(optimizer="adam", loss="mse")
 
     # --- 6. Entrenar con early stopping ---
     early_stop = EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True)
     reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1)
 
-    model.fit(X_train_seq, y_train_seq,
-              epochs=epochs,
-              batch_size=batch_size,
-              validation_split=0.1,
-              callbacks=[early_stop, reduce_lr],
-              verbose=1)
+    model_path = "lstm_rul.keras"
 
-    print("Entrenamiento terminado, guardando modelo...")
-    model.save(model_path)
-    print("Modelo guardado, empezando predicción en test...")
+    if os.path.exists(model_path):
+        print("Cargando modelo guardado...")
+        model = load_model(model_path)
+    else:
+        model.fit(
+            X_tr, y_tr,
+            validation_data=(X_val, y_val),
+            epochs=epochs,
+            batch_size=batch_size,
+            callbacks=[early_stop, reduce_lr],
+            verbose=1
+        )
 
-    # --- 7. Predicción en test con padding ---
-    # 1) Obtener todos los motores una sola vez
-    unit_numbers = df_test["unit_number"].values
-    features = df_test[feature_cols].values
+        print("Entrenamiento terminado, guardando modelo...")
+        model.save(model_path)
+        print("Modelo guardado, empezando predicción en test...")
 
-    print("Procesando test")
+    # --- 7. Predicción en test con padding y alineación ---
 
+    print("Procesando test...")
+
+    # 1) Obtener unidades únicas y ordenarlas
+    test_units = np.unique(df_test["unit_number"])
+    test_units.sort()  # orden consistente
+
+    # 2) Crear secuencias para cada motor
     X_test_seq = []
-    for unit in np.unique(unit_numbers):
-        mask = unit_numbers == unit
-        unit_data = features[mask]
+    for unit in test_units:
+        mask = df_test["unit_number"] == unit
+        unit_data = df_test.loc[mask, feature_cols].values
         if len(unit_data) < sequence_length:
             pad = np.zeros((sequence_length - len(unit_data), unit_data.shape[1]))
             unit_data = np.vstack([pad, unit_data])
+        # Tomamos la última ventana de tamaño sequence_length
         X_test_seq.append(unit_data[-sequence_length:])
 
     X_test_seq = np.array(X_test_seq)
+
+    # 3) Alinear y_test con el mismo orden de test_units
+    # Asumiendo que rul_path tiene RUL en orden de unit_number ascendente
+    y_test_aligned = np.array([y_test[unit-1] for unit in test_units], dtype=np.float32)
+
+    # 4) Predicción
     y_pred = model.predict(X_test_seq, batch_size=64).flatten()
 
-    print("Test procesado")
+    print("Test procesado.")
 
     # --- 8. Evaluar métricas ---
-    mse = mean_squared_error(y_test, y_pred)
+    mse = mean_squared_error(y_test_aligned, y_pred)
     rmse = np.sqrt(mse)
-    mae = np.mean(np.abs(y_test - y_pred))
-    mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
-    r2 = r2_score(y_test, y_pred)
+    mae = np.mean(np.abs(y_test_aligned - y_pred))
+    # MAPE seguro: evita división por 0
+    den = np.where(y_test_aligned == 0, 1e-6, y_test_aligned)
+    mape = np.mean(np.abs((y_test_aligned - y_pred) / den)) * 100
+    r2 = r2_score(y_test_aligned, y_pred)
 
     # NASA Score (CMAPSS)
     score = 0
-    for d in (y_pred - y_test):
+    for d in (y_pred - y_test_aligned):
         if d < 0:
             score += np.exp(-d/13) - 1
         else:
             score += np.exp(d/10) - 1
 
-    motores_test_unique = np.unique(df_test["unit_number"].values)
-
-    # Tabla de resultados
+    # 9. Tabla de resultados
     df_resultados = pd.DataFrame({
-        "Motor": motores_test_unique,
-        "RUL_real": y_test,
+        "Motor": test_units,
+        "RUL_real": y_test_aligned,
         "RUL_predicho": y_pred
     })
 
