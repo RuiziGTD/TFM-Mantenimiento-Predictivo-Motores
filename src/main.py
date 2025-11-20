@@ -26,3 +26,32 @@ if __name__ == "__main__":
     
     if spark:
         spark.stop()
+
+    mlflow.set_experiment("rul_lstm_experiment")
+
+with mlflow.start_run():
+    resultados = train_lstm_rul2(
+        train_path=[
+            "output/output_csv/train_FD001_filtrado.csv",
+            "output/output_csv/train_FD002_filtrado.csv",
+            "output/output_csv/train_FD003_filtrado.csv",
+            "output/output_csv/train_FD004_filtrado.csv"
+        ],
+        test_path="output/data_test/test_FD002_filtrado.csv",
+        rul_path="data/raw_data/RUL_FD002.txt",
+        epochs=200
+    )
+
+    # Log métricas
+    for k, v in resultados['metrics'].items():
+        mlflow.log_metric(k, v)
+
+    # Guardar modelo
+    mlflow.tensorflow.log_model(resultados['model'], "lstm_model")
+
+m = resultados['metrics']
+print(f"MSE: {m['MSE']:.2f}, RMSE: {m['RMSE']:.2f}, R2: {m['R2']:.3f}, NASA_Score: {m['NASA_Score']:.3f}")
+
+# Acceder a las predicciones
+df_pred = resultados['predicciones']
+print(df_pred.head())
