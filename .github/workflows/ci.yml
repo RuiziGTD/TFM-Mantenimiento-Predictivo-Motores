@@ -4,7 +4,7 @@ on:
   # Ejecuta este workflow en cada push a la rama compartida
   push:
     branches:
-      - "#1_pipeline"
+      - develop
   # Y también en cada Pull Request hacia 'main'
   pull_request:
     branches:
