@@ -121,7 +121,6 @@ def train_lstm_rul(
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-
     # --- 2. Cargar datos ---
     df_train = pd.read_csv(train_path)
     df_test = pd.read_csv(test_path)
