@@ -1,8 +1,10 @@
 from src.pipeline.pipeline import *
-from src.modelo_ia.modelo_prueba_1 import *
-from src.modelo_ia.modelo_prueba_3 import *
+from src.modelo_ia.modelo_1 import *
+from src.modelo_ia.modelo_2 import *
 from src.config import *
 from src.processing.spark import *
+import mlflow
+import mlflow.tensorflow
 
 
 open("logs/pipeline.log", "w").close()
@@ -23,17 +25,27 @@ if __name__ == "__main__":
     if spark:
         spark.stop()
 
-resultados = train_lstm_rul(
-    train_path=[
-        "output/output_csv/train_FD001_filtrado.csv",
-        "output/output_csv/train_FD002_filtrado.csv",
-        "output/output_csv/train_FD003_filtrado.csv",
-        "output/output_csv/train_FD004_filtrado.csv"
-    ],
-    test_path="output/data_test/test_FD002_filtrado.csv",
-    rul_path="data/raw_data/RUL_FD002.txt",
-    epochs=200
-)
+mlflow.set_experiment("rul_lstm_experiment")
+
+with mlflow.start_run():
+    resultados = train_lstm_rul2(
+        train_path=[
+            "output/output_csv/train_FD001_filtrado.csv",
+            "output/output_csv/train_FD002_filtrado.csv",
+            "output/output_csv/train_FD003_filtrado.csv",
+            "output/output_csv/train_FD004_filtrado.csv"
+        ],
+        test_path="output/data_test/test_FD002_filtrado.csv",
+        rul_path="data/raw_data/RUL_FD002.txt",
+        epochs=200
+    )
+
+    # Log métricas
+    for k, v in resultados['metrics'].items():
+        mlflow.log_metric(k, v)
+
+    # Guardar modelo
+    mlflow.tensorflow.log_model(resultados['model'], "lstm_model")
 
 m = resultados['metrics']
 print(f"MSE: {m['MSE']:.2f}, RMSE: {m['RMSE']:.2f}, R2: {m['R2']:.3f}, NASA_Score: {m['NASA_Score']:.3f}")
@@ -41,17 +53,3 @@ print(f"MSE: {m['MSE']:.2f}, RMSE: {m['RMSE']:.2f}, R2: {m['R2']:.3f}, NASA_Scor
 # Acceder a las predicciones
 df_pred = resultados['predicciones']
 print(df_pred.head())
-
-
-"""
-resultados_fd002 = train_lstm_rul(
-    train_path="../output/output_csv/train_FD002_filtrado.csv",
-    test_path="../output/data_test/test_FD002_filtrado.csv",
-    rul_path="../data/raw_data/RUL_FD002.txt",
-    sequence_length=50,
-    epochs=100
-)
-
-print("\nPredicciones FD002 (primeras filas):")
-print(resultados_fd002["predicciones"].head())
-"""

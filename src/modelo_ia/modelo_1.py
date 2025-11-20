@@ -220,3 +220,16 @@ def train_lstm_rul(train_path, test_path, rul_path,
 3      4       110    116.111702
 4      5        15     12.081519
 """
+
+"""
+resultados_fd002 = train_lstm_rul(
+    train_path="../output/output_csv/train_FD002_filtrado.csv",
+    test_path="../output/data_test/test_FD002_filtrado.csv",
+    rul_path="../data/raw_data/RUL_FD002.txt",
+    sequence_length=50,
+    epochs=100
+)
+
+print("\nPredicciones FD002 (primeras filas):")
+print(resultados_fd002["predicciones"].head())
+"""

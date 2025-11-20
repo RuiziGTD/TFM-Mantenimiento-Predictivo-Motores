@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 import os
 
-def train_lstm_rul(train_path, test_path, rul_path,
+def train_lstm_rul2(train_path, test_path, rul_path,
                    sequence_length=50, epochs=200, batch_size=64,
                    model_path="lstm_rul.keras"):
     """
