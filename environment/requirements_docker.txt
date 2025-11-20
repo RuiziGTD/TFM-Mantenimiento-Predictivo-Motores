@@ -1,0 +1,19 @@
+# API
+fastapi
+uvicorn[standard]
+
+# Dashboard
+streamlit
+
+# ML & Data
+mlflow
+pyspark
+pandas
+numpy
+scikit-learn
+matplotlib
+
+# Pruebas
+pytest
+httpx
+black

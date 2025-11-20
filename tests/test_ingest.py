@@ -1,15 +1,19 @@
 # TEST 2: Carga de datos inventados
 
-from src.ingest.batch_ingest import load_batch
+from src.ingest.batch_ingest import procesar_varios_archivos
 import pandas as pd
 import tempfile, os, pytest
 
-def test_load_batch_ok():
-    data = "1 2 3\n4 5 6"
-    with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
-        f.write(data)
-        path = f.name
-    df = load_batch(path)
-    assert isinstance(df, pd.DataFrame)
-    assert df.shape == (2, 3)
-    os.remove(path)
+
+def test_procesar_varios_archivos_ok(tmp_path):
+    data = " ".join(["1"] * 26) + "\n" + " ".join(["2"] * 26)
+
+    path = tmp_path / "test.txt"
+    path.write_text(data)
+
+    resultados = procesar_varios_archivos(None, [str(path)])
+
+    assert isinstance(resultados, list)
+    assert len(resultados) == 1
+    assert isinstance(resultados[0], pd.DataFrame)
+    assert resultados[0].shape[0] == 2

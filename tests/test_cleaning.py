@@ -1,6 +1,9 @@
 import pytest
 import pandas as pd
-from src.processing.cleaning import assign_column_names, identificar_sensores_irrelevantes
+from src.processing.cleaning import (
+    assign_column_names,
+    identificar_sensores_irrelevantes_y_guardar,
+)
 
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
@@ -21,7 +24,7 @@ def test_assign_column_names_ok():
 
 
 # TEST 4: Para identificar_sensores_irrelevantes con valores de desviación estandar simulados
-def test_identificar_sensores_irrelevantes_ok():
+def test_identificar_sensores_irrelevantes_ok(tmp_path):
     # Crear DataFrame con sensores, algunos sin variación
     data = {
         "unit_number": [1, 2, 3],
@@ -32,48 +35,40 @@ def test_identificar_sensores_irrelevantes_ok():
         # sensores relevantes (varían)
         "T2": [1, 2, 3],
         "T24": [10, 20, 30],
-        "T30": [5, 5, 5],     # <- sin variación
+        "T30": [5, 5, 5],  # <- sin variación
         "T50": [2, 3, 4],
-        "P2": [1.0, 1.0, 1.0], # <- sin variación
+        "P2": [1.0, 1.0, 1.0],  # <- sin variación
         "P15": [2, 2.1, 2.2],
         "P30": [3, 4, 5],
         "Nf": [6, 7, 8],
         "Nc": [9, 10, 11],
-        "epr": [1, 1, 1],     # <- sin variación
+        "epr": [1, 1, 1],  # <- sin variación
         "Ps30": [2, 3, 2.5],
         "phi": [0.1, 0.2, 0.3],
         "NRf": [100, 101, 99],
-        "NRc": [200, 200, 200], # <- sin variación
+        "NRc": [200, 200, 200],  # <- sin variación
         "BPR": [0.5, 0.6, 0.7],
         "farB": [0.8, 0.9, 1.0],
-        "htBleed": [0.0, 0.0, 0.0], # <- sin variación
+        "htBleed": [0.0, 0.0, 0.0],  # <- sin variación
         "Nf_dmd": [5, 6, 7],
         "PCNfR_dmd": [7, 8, 9],
         "W31": [1, 2, 3],
-        "W32": [1, 1, 1], # <- sin variación
+        "W32": [1, 1, 1],  # <- sin variación
     }
     df = pd.DataFrame(data)
+    path = tmp_path / "test.txt"
+    df.to_csv(path, sep=" ", header=False, index=False)
 
-    result = identificar_sensores_irrelevantes(df)
+    result = identificar_sensores_irrelevantes_y_guardar(None, str(path))
 
-    # Comprobaciones básicas
-    assert isinstance(result, dict)
-    assert "df_train" in result
-    assert "sensors_to_drop" in result
-    assert "sensors_to_keep" in result
+    assert isinstance(result, pd.DataFrame)
+    assert result.shape[0] == 3
+    irrelevantes = ["T30", "P2", "epr", "NRc", "htBleed", "W32"]
 
-    drop = result["sensors_to_drop"]
-    keep = result["sensors_to_keep"]
+    for col in irrelevantes:
+        assert col not in result.columns, f"{col} debería haber sido eliminado"
 
-    # Debe detectar sensores con desviación estándar ~0
-    assert "T30" in drop
-    assert "P2" in drop
-    assert "epr" in drop
-    assert "NRc" in drop
-    assert "htBleed" in drop
-    assert "W32" in drop
-
-    # Asegurar que los que varían se mantienen
-    assert "T2" in keep
-    assert "phi" in keep
-    assert all(col not in result["df_train"].columns for col in drop)
+    # Y opcional: comprobar que alguno relevante siga presente
+    relevantes = ["T2", "T24", "T50", "P15"]
+    for col in relevantes:
+        assert col in result.columns, f"{col} no debería eliminarse"

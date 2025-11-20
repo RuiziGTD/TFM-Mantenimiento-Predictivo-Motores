@@ -8,6 +8,7 @@ import os
 load_dotenv(dotenv_path="environment/.env")
 logger = get_logger(__name__)
 
+
 def run_pipeline(spark):
     """
     Ejecuta el pipeline completo sobre TRAIN y TEST.
@@ -66,5 +67,4 @@ def run_pipeline(spark):
 
     print("\nPipeline completado correctamente.")
     return resultados_train, resultados_test
-
 

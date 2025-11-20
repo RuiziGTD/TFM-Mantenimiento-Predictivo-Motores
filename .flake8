@@ -1,0 +1,24 @@
+[flake8]
+# 1. Permitimos líneas más largas (Black a veces deja líneas de 88-100 chars)
+max-line-length = 120
+
+# 2. Ignoramos errores que chocan con Black
+extend-ignore = E203
+
+# 3. Carpetas que no hay que revisar nunca
+exclude = .git,__pycache__,docs,old,build,dist,mlruns,.venv,env
+
+# 4. EXCEPCIONES ESPECÍFICAS (Aquí está la magia)
+per-file-ignores =
+    # En los ficheros __init__.py, es normal importar cosas y no usarlas
+    __init__.py:F401
+    
+    # En spark.py, permitimos imports no usados (F401) y múltiples imports (E401)
+    src/processing/spark.py:F401,E401
+    
+    # En main.py y pipeline.py, permitimos "import *" (F403, F405)
+    src/main.py:F403,F405
+    src/pipeline/pipeline.py:F403,F405
+    
+    # En cleaning.py, permitimos f-strings vacíos si son necesarios (F541)
+    src/processing/cleaning.py:F541
