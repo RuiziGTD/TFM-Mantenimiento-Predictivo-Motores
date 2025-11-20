@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import os
+import matplotlib.pyplot as plt
 
 
 def train_lstm_rul2(
@@ -192,6 +193,16 @@ def train_lstm_rul2(
     y_pred = model.predict(X_test_seq, batch_size=64).flatten()
 
     print("Test procesado.")
+
+    plt.figure(figsize=(8,5))
+    plt.scatter(y_test_aligned, y_pred, s=20)
+    max_r = max(y_test_aligned)
+    plt.plot([0, max_r], [0, max_r], '--')
+    plt.xlabel("RUL Real")
+    plt.ylabel("RUL Predicho")
+    plt.title("Real vs Predicho - Test")
+    plt.grid()
+    plt.show()
 
     # --- 8. Evaluar métricas ---
     mse = mean_squared_error(y_test_aligned, y_pred)
