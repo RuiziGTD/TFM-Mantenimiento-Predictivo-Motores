@@ -121,44 +121,6 @@ def train_lstm_rul(
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    return {"model": model, "metrics": {"MSE": mse, "R2": r2}}
-
-
-def train_lstm_rul(
-    train_path,
-    test_path,
-    rul_path,
-    sequence_length=50,
-    epochs=100,
-    batch_size=64,
-    model_path="lstm_rul.keras",
-):
-    """
-    Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
-    Incluye padding automático, dropout, early stopping y métricas completas.
-    """
-
-    # --- 1. Definir columnas ---
-    feature_cols = [
-        "time_in_cycles",
-        "op_setting_1",
-        "op_setting_2",
-        "op_setting_3",
-        "T24",
-        "T30",
-        "T50",
-        "P30",
-        "Nf",
-        "Nc",
-        "Ps30",
-        "phi",
-        "NRf",
-        "NRc",
-        "BPR",
-        "htBleed",
-        "W31",
-        "W32",
-    ]
 
     # --- 2. Cargar datos ---
     df_train = pd.read_csv(train_path)
