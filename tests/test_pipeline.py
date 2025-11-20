@@ -4,6 +4,7 @@ import pandas as pd
 
 # TEST 1: Testear la carga de datos con un dataset inventado
 
+
 def test_run_pipeline(monkeypatch, tmp_path):
     file = tmp_path / "fake.csv"
     file.write_text(" ".join(["1"] * 26) + "\n" + " ".join(["2"] * 26))
