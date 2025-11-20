@@ -205,10 +205,10 @@ def train_lstm_rul2(
 
         print("Test procesado.")
 
-        plt.figure(figsize=(8,5))
+        plt.figure(figsize=(8, 5))
         plt.scatter(y_test_aligned, y_pred, s=20)
         max_r = max(y_test_aligned)
-        plt.plot([0, max_r], [0, max_r], '--')
+        plt.plot([0, max_r], [0, max_r], "--")
         plt.xlabel("RUL Real")
         plt.ylabel("RUL Predicho")
         plt.title("Real vs Predicho - Test")
@@ -237,7 +237,8 @@ def train_lstm_rul2(
             {"Motor": test_units, "RUL_real": y_test_aligned, "RUL_predicho": y_pred}
         )
 
-        resultados = {"model": model,
+        resultados = {
+            "model": model,
             "metrics": {
                 "MSE": mse,
                 "RMSE": rmse,
@@ -246,7 +247,8 @@ def train_lstm_rul2(
                 "R2": r2,
                 "NASA_Score": score,
             },
-            "predicciones": df_resultados}
+            "predicciones": df_resultados,
+        }
 
         for k, v in resultados["metrics"].items():
             mlflow.log_metric(k, v)
