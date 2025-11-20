@@ -57,9 +57,11 @@ def test_identificar_sensores_irrelevantes_ok(tmp_path):
     }
     df = pd.DataFrame(data)
     path = tmp_path / "test.txt"
+    path_csv = tmp_path / "csv"
+    path_test = tmp_path / "test"
     df.to_csv(path, sep=" ", header=False, index=False)
 
-    result = identificar_sensores_irrelevantes_y_guardar(None, str(path))
+    result = identificar_sensores_irrelevantes_y_guardar(None, str(path), path_csv, path_test)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3

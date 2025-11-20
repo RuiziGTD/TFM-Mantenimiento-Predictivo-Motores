@@ -9,9 +9,11 @@ def test_procesar_varios_archivos_ok(tmp_path):
     data = " ".join(["1"] * 26) + "\n" + " ".join(["2"] * 26)
 
     path = tmp_path / "test.txt"
+    path_csv = tmp_path / "csv"
+    path_test = tmp_path / "test"
     path.write_text(data)
 
-    resultados = procesar_varios_archivos(None, [str(path)])
+    resultados = procesar_varios_archivos(None, [str(path)], path_csv, path_test)
 
     assert isinstance(resultados, list)
     assert len(resultados) == 1
