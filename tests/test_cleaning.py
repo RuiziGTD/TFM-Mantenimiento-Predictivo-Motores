@@ -5,6 +5,7 @@ from src.processing.cleaning import (
     identificar_sensores_irrelevantes_y_guardar,
 )
 
+
 # TEST 3: Para assign_column_names con un dataset de mentira
 def test_assign_column_names_ok():
     # Simular dataset crudo con 26 columnas (5 + 21 sensores)
@@ -61,7 +62,9 @@ def test_identificar_sensores_irrelevantes_ok(tmp_path):
     path_test = tmp_path / "test"
     df.to_csv(path, sep=" ", header=False, index=False)
 
-    result = identificar_sensores_irrelevantes_y_guardar(None, str(path), path_csv, path_test)
+    result = identificar_sensores_irrelevantes_y_guardar(
+        None, str(path), path_csv, path_test
+    )
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3

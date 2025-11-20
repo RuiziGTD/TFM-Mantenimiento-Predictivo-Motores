@@ -50,14 +50,13 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def identificar_sensores_irrelevantes_y_guardar(
-    spark,
-    path_txt: str,
-    CARPETA_OUTPUT_CSV: str,
-    CARPETA_OUTPUT_DATA_TEST: str
+    spark, path_txt: str, CARPETA_OUTPUT_CSV: str, CARPETA_OUTPUT_DATA_TEST: str
 ) -> pd.DataFrame:
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
-    df_raw.dropna(axis=1, how="all", inplace=True)  # Eliminar columnas vacías por separadores extra
+    df_raw.dropna(
+        axis=1, how="all", inplace=True
+    )  # Eliminar columnas vacías por separadores extra
 
     # Asignar nombres de columnas
     df_named = assign_column_names(df_raw)
@@ -81,7 +80,9 @@ def identificar_sensores_irrelevantes_y_guardar(
     elif "test" in filename_raw:
         output_dir = CARPETA_OUTPUT_DATA_TEST
     else:
-        raise ValueError(f"No se reconoce si el archivo es train o test: {filename_raw}")
+        raise ValueError(
+            f"No se reconoce si el archivo es train o test: {filename_raw}"
+        )
 
     # Crear carpeta si no existe
     os.makedirs(output_dir, exist_ok=True)
@@ -100,6 +101,7 @@ def identificar_sensores_irrelevantes_y_guardar(
     if spark:
         spark_data_lake(spark, df_filtered, path_txt)
     return df_filtered
+
 
 def calcular_rul(df: pd.DataFrame) -> pd.DataFrame:
     """

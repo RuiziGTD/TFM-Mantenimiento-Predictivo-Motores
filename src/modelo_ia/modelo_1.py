@@ -6,9 +6,16 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 
-def train_lstm_rul(train_path, test_path, rul_path,
-                   sequence_length=50, epochs=100, batch_size=64,
-                   model_path="lstm_rul.keras"):
+
+def train_lstm_rul(
+    train_path,
+    test_path,
+    rul_path,
+    sequence_length=50,
+    epochs=100,
+    batch_size=64,
+    model_path="lstm_rul.keras",
+):
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dos capas LSTM, dropout y early stopping.
@@ -17,9 +24,23 @@ def train_lstm_rul(train_path, test_path, rul_path,
     # --- 1. Definir columnas ---
     feature_cols = [
         "time_in_cycles",
-        "op_setting_1","op_setting_2","op_setting_3",
-        "T24","T30","T50","P30","Nf","Nc","Ps30","phi",
-        "NRf","NRc","BPR","htBleed","W31","W32"
+        "op_setting_1",
+        "op_setting_2",
+        "op_setting_3",
+        "T24",
+        "T30",
+        "T50",
+        "P30",
+        "Nf",
+        "Nc",
+        "Ps30",
+        "phi",
+        "NRf",
+        "NRc",
+        "BPR",
+        "htBleed",
+        "W31",
+        "W32",
     ]
 
     # --- 2. Cargar datos ---
@@ -40,31 +61,42 @@ def train_lstm_rul(train_path, test_path, rul_path,
             unit_rul = unit_data["RUL"].values
 
             for i in range(len(unit_features) - seq_len + 1):
-                X.append(unit_features[i:i+seq_len])
-                y.append(unit_rul[i+seq_len-1])
+                X.append(unit_features[i : i + seq_len])
+                y.append(unit_rul[i + seq_len - 1])
         return np.array(X), np.array(y)
 
     X_train_seq, y_train_seq = create_sequences(df_train, sequence_length)
 
     # --- 5. Definir modelo LSTM mejorado ---
-    model = models.Sequential([
-        layers.LSTM(64, return_sequences=True, input_shape=(sequence_length, len(feature_cols))),
-        layers.Dropout(0.2),
-        layers.LSTM(32),
-        layers.Dropout(0.2),
-        layers.Dense(16, activation="relu"),
-        layers.Dense(1)  # salida RUL
-    ])
+    model = models.Sequential(
+        [
+            layers.LSTM(
+                64,
+                return_sequences=True,
+                input_shape=(sequence_length, len(feature_cols)),
+            ),
+            layers.Dropout(0.2),
+            layers.LSTM(32),
+            layers.Dropout(0.2),
+            layers.Dense(16, activation="relu"),
+            layers.Dense(1),  # salida RUL
+        ]
+    )
     model.compile(optimizer="adam", loss="mse")
 
     # --- 6. Entrenar con early stopping ---
-    early_stop = EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True)
-    model.fit(X_train_seq, y_train_seq,
-              epochs=epochs,
-              batch_size=batch_size,
-              validation_split=0.1,
-              callbacks=[early_stop],
-              verbose=1)
+    early_stop = EarlyStopping(
+        monitor="val_loss", patience=10, restore_best_weights=True
+    )
+    model.fit(
+        X_train_seq,
+        y_train_seq,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_split=0.1,
+        callbacks=[early_stop],
+        verbose=1,
+    )
 
     model.save(model_path)
 
@@ -76,26 +108,31 @@ def train_lstm_rul(train_path, test_path, rul_path,
 
         # Padding si el motor tiene menos ciclos que sequence_length
         if len(unit_features) < sequence_length:
-            pad = np.zeros((sequence_length - len(unit_features), unit_features.shape[1]))
+            pad = np.zeros(
+                (sequence_length - len(unit_features), unit_features.shape[1])
+            )
             unit_features = np.vstack([pad, unit_features])
 
         last_seq = unit_features[-sequence_length:]
-        pred = model.predict(last_seq[np.newaxis, :, :])[0,0]
+        pred = model.predict(last_seq[np.newaxis, :, :])[0, 0]
         y_pred.append(pred)
 
     # --- 8. Evaluar ---
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    return {
-        "model": model,
-        "metrics": {"MSE": mse, "R2": r2}
-    }
+    return {"model": model, "metrics": {"MSE": mse, "R2": r2}}
 
 
-def train_lstm_rul(train_path, test_path, rul_path,
-                   sequence_length=50, epochs=100, batch_size=64,
-                   model_path="lstm_rul.keras"):
+def train_lstm_rul(
+    train_path,
+    test_path,
+    rul_path,
+    sequence_length=50,
+    epochs=100,
+    batch_size=64,
+    model_path="lstm_rul.keras",
+):
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dropout, early stopping y métricas completas.
@@ -104,9 +141,23 @@ def train_lstm_rul(train_path, test_path, rul_path,
     # --- 1. Definir columnas ---
     feature_cols = [
         "time_in_cycles",
-        "op_setting_1","op_setting_2","op_setting_3",
-        "T24","T30","T50","P30","Nf","Nc","Ps30","phi",
-        "NRf","NRc","BPR","htBleed","W31","W32"
+        "op_setting_1",
+        "op_setting_2",
+        "op_setting_3",
+        "T24",
+        "T30",
+        "T50",
+        "P30",
+        "Nf",
+        "Nc",
+        "Ps30",
+        "phi",
+        "NRf",
+        "NRc",
+        "BPR",
+        "htBleed",
+        "W31",
+        "W32",
     ]
 
     # --- 2. Cargar datos ---
@@ -127,32 +178,41 @@ def train_lstm_rul(train_path, test_path, rul_path,
             unit_rul = unit_data["RUL"].values
 
             for i in range(len(unit_features) - seq_len + 1):
-                X.append(unit_features[i:i+seq_len])
-                y.append(unit_rul[i+seq_len-1])
+                X.append(unit_features[i : i + seq_len])
+                y.append(unit_rul[i + seq_len - 1])
         return np.array(X), np.array(y)
 
     X_train_seq, y_train_seq = create_sequences(df_train, sequence_length)
 
     # --- 5. Definir modelo LSTM ---
-    model = models.Sequential([
-        layers.Masking(mask_value=0., input_shape=(sequence_length, len(feature_cols))),
-        layers.LSTM(64, return_sequences=True),
-        layers.Dropout(0.2),
-        layers.LSTM(32),
-        layers.Dropout(0.2),
-        layers.Dense(16, activation="relu"),
-        layers.Dense(1)  # salida RUL
-    ])
+    model = models.Sequential(
+        [
+            layers.Masking(
+                mask_value=0.0, input_shape=(sequence_length, len(feature_cols))
+            ),
+            layers.LSTM(64, return_sequences=True),
+            layers.Dropout(0.2),
+            layers.LSTM(32),
+            layers.Dropout(0.2),
+            layers.Dense(16, activation="relu"),
+            layers.Dense(1),  # salida RUL
+        ]
+    )
     model.compile(optimizer="adam", loss="mse")
 
     # --- 6. Entrenar con early stopping ---
-    early_stop = EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True)
-    model.fit(X_train_seq, y_train_seq,
-              epochs=epochs,
-              batch_size=batch_size,
-              validation_split=0.1,
-              callbacks=[early_stop],
-              verbose=1)
+    early_stop = EarlyStopping(
+        monitor="val_loss", patience=10, restore_best_weights=True
+    )
+    model.fit(
+        X_train_seq,
+        y_train_seq,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_split=0.1,
+        callbacks=[early_stop],
+        verbose=1,
+    )
 
     model.save(model_path)
 
@@ -165,11 +225,13 @@ def train_lstm_rul(train_path, test_path, rul_path,
 
         # Padding si el motor tiene menos ciclos que sequence_length
         if len(unit_features) < sequence_length:
-            pad = np.zeros((sequence_length - len(unit_features), unit_features.shape[1]))
+            pad = np.zeros(
+                (sequence_length - len(unit_features), unit_features.shape[1])
+            )
             unit_features = np.vstack([pad, unit_features])
 
         last_seq = unit_features[-sequence_length:]
-        pred = model.predict(last_seq[np.newaxis, :, :])[0,0]
+        pred = model.predict(last_seq[np.newaxis, :, :])[0, 0]
         y_pred.append(pred)
 
     # --- 8. Evaluar métricas ---
@@ -181,18 +243,16 @@ def train_lstm_rul(train_path, test_path, rul_path,
 
     # NASA Score (CMAPSS)
     score = 0
-    for d in (y_pred - y_test):
+    for d in y_pred - y_test:
         if d < 0:
-            score += np.exp(-d/13) - 1
+            score += np.exp(-d / 13) - 1
         else:
-            score += np.exp(d/10) - 1
+            score += np.exp(d / 10) - 1
 
     # Tabla de resultados
-    df_resultados = pd.DataFrame({
-        "Motor": motores_test,
-        "RUL_real": y_test,
-        "RUL_predicho": y_pred
-    })
+    df_resultados = pd.DataFrame(
+        {"Motor": motores_test, "RUL_real": y_test, "RUL_predicho": y_pred}
+    )
 
     return {
         "model": model,
@@ -202,10 +262,11 @@ def train_lstm_rul(train_path, test_path, rul_path,
             "MAE": mae,
             "MAPE": mape,
             "R2": r2,
-            "NASA_Score": score
+            "NASA_Score": score,
         },
-        "predicciones": df_resultados
+        "predicciones": df_resultados,
     }
+
 
 # RESULTADOS
 """
