@@ -61,6 +61,7 @@ DATA_PATHS_ENTRENAMIENTO_PRUEBA = [
 
 CARPETA_OUTPUT = os.path.join(BASE_DIR, "../output")
 
+EDA_OUTPUT = "resultados_eda"
 
 CSV_OUTPUT = "output/output_csv"
 PARQUET_OUTPUT = "output/output_parquet"

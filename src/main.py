@@ -7,19 +7,26 @@ from src.processing.spark import *
 open("logs/pipeline.log", "w").close()
 
 if __name__ == "__main__":
-    choice = None
-    while choice not in ("y", "n"):
-        choice = input(
+    spark_choice = None
+    while spark_choice not in ("y", "n"):
+        spark_choice = input(
             "¿Quieres usar spark? Se recomienda encarecidamente el uso de entorno Linux para el uso de Spark (y/n): "
         ).lower()
-        if choice not in ("y", "n"):
+        if spark_choice not in ("y", "n"):
             print(
                 "Caracter no reconocido, por favor responda usando 'y' en caso afirmativo o 'n' en caso negativo"
             )
+    
+    eda_choice = input(
+            "¿Quieres crear un EDA? Este se guardara en \"resultados_eda/\" (solo se creará en caso de realizar el filtrado) (Y/n): "
+        ).lower()
 
-    spark = spark_init() if choice == "y" else None
+    spark = spark_init() if spark_choice == "y" else None
+    eda = "y" if eda_choice != "n" else None
 
-    run_pipeline(spark)
+    params = [spark, eda]
+
+    run_pipeline(params)
 
     if spark:
         spark.stop()

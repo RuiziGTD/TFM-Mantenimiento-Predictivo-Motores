@@ -9,7 +9,7 @@ load_dotenv(dotenv_path="environment/.env")
 logger = get_logger(__name__)
 
 
-def run_pipeline(spark):
+def run_pipeline(params):
     """
     Ejecuta el pipeline completo sobre TRAIN y TEST.
     Procesa y guarda en carpetas correspondientes.
@@ -43,7 +43,7 @@ def run_pipeline(spark):
     # ----------------------
     try:
         resultados_train = procesar_varios_archivos(
-            spark, DATA_PATHS_TRAIN, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
+            params, DATA_PATHS_TRAIN, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
         )
         logger.info("Pipeline ejecutado correctamente sobre todos los archivos TRAIN.")
     except Exception as e:
@@ -64,7 +64,7 @@ def run_pipeline(spark):
 
     try:
         resultados_test = procesar_varios_archivos(
-            spark, rutas_test, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
+            params, rutas_test, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
         )
         logger.info("Pipeline ejecutado correctamente sobre todos los archivos TEST.")
     except Exception as e:

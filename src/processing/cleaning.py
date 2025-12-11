@@ -1,5 +1,6 @@
 from src.utils.logger import get_logger  # Obtain logs
 from src.processing.spark import spark_data_lake
+from src.processing.eda import view_eda
 import pandas as pd
 import os
 
@@ -50,8 +51,11 @@ def assign_column_names(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def identificar_sensores_irrelevantes_y_guardar(
-    spark, path_txt: str, CARPETA_OUTPUT_CSV: str, CARPETA_OUTPUT_DATA_TEST: str
+    params, path_txt: str, CARPETA_OUTPUT_CSV: str, CARPETA_OUTPUT_DATA_TEST: str
 ) -> pd.DataFrame:
+    
+    # Definir parametros:
+    spark, eda = params
     # Cargar el archivo .txt
     df_raw = pd.read_csv(path_txt, sep=" ", header=None)
     df_raw.dropna(
@@ -61,18 +65,22 @@ def identificar_sensores_irrelevantes_y_guardar(
     # Asignar nombres de columnas
     df_named = assign_column_names(df_raw)
 
-    # Identificar sensores irrelevantes
-    sensor_columns = df_named.columns[5:]
-    sensor_std = df_named[sensor_columns].std()
-    sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
-    df_filtered = df_named.drop(columns=sensors_to_drop)
-
     # Detectar tipo de archivo por nombre
     filename_raw = os.path.basename(path_txt).lower()
 
     # Añadir columna RUL solo para train
     if "train" in filename_raw:
-        df_filtered = calcular_rul(df_filtered)
+        df_named = calcular_rul(df_named)
+
+    # Examinar EDA:
+    if eda == "y" and "train" in filename_raw:
+        view_eda(df_named, filename_raw)
+
+    # Identificar sensores irrelevantes
+    sensor_columns = df_named.columns[5:]
+    sensor_std = df_named[sensor_columns].std()
+    sensors_to_drop = sensor_std[sensor_std < 0.01].index.tolist()
+    df_filtered = df_named.drop(columns=sensors_to_drop)
 
     # Seleccionar carpeta de salida
     if "train" in filename_raw:

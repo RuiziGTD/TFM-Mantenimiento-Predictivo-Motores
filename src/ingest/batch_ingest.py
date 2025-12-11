@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 
 def procesar_varios_archivos(
-    spark,
+    params,
     lista_rutas: list[str],
     CARPETA_OUTPUT_CSV: str,
     CARPETA_OUTPUT_DATA_TEST: str,
@@ -23,7 +23,7 @@ def procesar_varios_archivos(
         try:
             logger.info(f"Procesando archivo: {ruta}")
             df_filtrado = identificar_sensores_irrelevantes_y_guardar(
-                spark, ruta, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
+                params, ruta, CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
             )
             resultados.append(df_filtrado)
 
