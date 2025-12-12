@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from src.utils.logger import get_logger
-from src.utils.reproducibility import set_seeds  # <--- TU APORTACIÓN CLAVE
+from src.utils.reproducibility import set_seeds
 
 # Configuración
 logger = get_logger(__name__)
