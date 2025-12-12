@@ -12,8 +12,10 @@ pandas
 numpy
 scikit-learn
 matplotlib
+seaborn
+tensorflow
 
-# Pruebas
+# Pruebas & Calidad
 pytest
 httpx
 black

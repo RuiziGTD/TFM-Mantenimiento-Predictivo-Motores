@@ -1,11 +1,13 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras import layers, models
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.metrics import mean_squared_error, r2_score
-import tensorflow as tf
+from src.utils.reproducibility import set_seeds
 
+# Resto del código...
 
 def train_lstm_rul(
     train_path,
@@ -16,6 +18,10 @@ def train_lstm_rul(
     batch_size=64,
     model_path="lstm_rul.keras",
 ):
+    # --- IMPORTS DIFERIDOS (Para evitar bloqueo en Mac) ---
+    from sklearn.preprocessing import MinMaxScaler
+    from sklearn.metrics import mean_squared_error, r2_score
+    # ------------------------------------------------------
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dos capas LSTM, dropout y early stopping.
@@ -228,6 +234,33 @@ def train_lstm_rul(
         "predicciones": df_resultados,
     }
 
+if __name__ == "__main__":
+    # --- BLOQUE DE EJECUCIÓN DIRECTA (Necesario para Make) ---
+    set_seeds()  # Activar reproducibilidad
+
+    print("Iniciando entrenamiento automático de LSTM...")
+
+    # Usamos try/except para capturar errores si no existen los datos
+    try:
+        # Rutas por defecto para una ejecución estándar
+        resultados = train_lstm_rul(
+            train_path="output/output_csv/train_FD001_filtrado.csv",
+            test_path="output/data_test/test_FD001_filtrado.csv",
+            rul_path="data/raw_data/RUL_FD001.txt",
+            epochs=50,  # Pocas épocas para probar el pipeline rápido
+        )
+
+        m = resultados["metrics"]
+        print(f"\n✅ Entrenamiento completado correctamente.")
+        print(f"   RMSE: {m['RMSE']:.2f}")
+        print(f"   NASA Score: {m['NASA_Score']:.2f}")
+
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: No se encuentran los archivos de datos.")
+        print(f"   Detalle: {e}")
+        print(
+            "   -> Asegúrate de ejecutar 'make pipeline' primero para generar los CSV filtrados."
+        )
 
 # RESULTADOS
 """

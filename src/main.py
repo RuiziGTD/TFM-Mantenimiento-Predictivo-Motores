@@ -1,24 +1,35 @@
-from src.pipeline.pipeline import *
-from src.modelo_ia.modelo_1 import *
-from src.modelo_ia.modelo_2 import *
+from src.pipeline.pipeline import run_pipeline
 from src.config import *
-from src.processing.spark import *
+from src.processing.spark import spark_init
+from src.utils.reproducibility import set_seeds
+import os
 
-open("logs/pipeline.log", "w").close()
+# Limpiamos imports de modelos (TensorFlow) para evitar el bloqueo 'mutex' en Mac.
+# El entrenamiento ahora se gestiona separadamente vía Makefile.
 
 if __name__ == "__main__":
+    # 1. Configuración Inicial
+    set_seeds(seed=42, use_tensorflow=False) 
+    
+    
+    # Asegurar carpeta de logs
+    os.makedirs("logs", exist_ok=True)
+    open("logs/pipeline.log", "w").close()
+
+    # 2. Configuración de Spark (Interacción reducida para automatización)
+    # Si quieres que el Makefile no se detenga, podrías forzar 'n' o leer argumentos.
+    # De momento mantenemos tu lógica original.
+    
     spark_choice = None
     while spark_choice not in ("y", "n"):
         spark_choice = input(
-            "¿Quieres usar spark? Se recomienda encarecidamente el uso de entorno Linux para el uso de Spark (y/n): "
+            "¿Quieres usar spark? (y/n): "
         ).lower()
         if spark_choice not in ("y", "n"):
-            print(
-                "Caracter no reconocido, por favor responda usando 'y' en caso afirmativo o 'n' en caso negativo"
-            )
+            print("Carácter no reconocido.")
     
     eda_choice = input(
-            "¿Quieres crear un EDA? Este se guardara en \"resultados_eda/\" (solo se creará en caso de realizar el filtrado) (Y/n): "
+            "¿Quieres crear un EDA? (Y/n): "
         ).lower()
 
     spark = spark_init() if spark_choice == "y" else None
@@ -26,28 +37,12 @@ if __name__ == "__main__":
 
     params = [spark, eda]
 
+    # 3. Ejecutar SOLO el Pipeline de Datos
+    print("Iniciando Pipeline de Datos...")
     run_pipeline(params)
 
     if spark:
         spark.stop()
-
-    resultados = train_lstm_rul2(
-        train_path=[
-            "output/output_csv/train_FD001_filtrado.csv",
-            "output/output_csv/train_FD002_filtrado.csv",
-            "output/output_csv/train_FD003_filtrado.csv",
-            "output/output_csv/train_FD004_filtrado.csv",
-        ],
-        test_path="output/data_test/test_FD002_filtrado.csv",
-        rul_path="data/raw_data/RUL_FD002.txt",
-        epochs=200,
-    )
-
-    m = resultados["metrics"]
-    print(
-        f"MSE: {m['MSE']:.2f}, RMSE: {m['RMSE']:.2f}, R2: {m['R2']:.3f}, NASA_Score: {m['NASA_Score']:.3f}"
-    )
-
-    # Acceder a las predicciones
-    df_pred = resultados["predicciones"]
-    print(df_pred.head())
+        
+    print("Pipeline de datos finalizado. Los archivos están listos en 'output/'.")
+    # El entrenamiento (LSTM) se ejecutará en el siguiente paso del Makefile.
