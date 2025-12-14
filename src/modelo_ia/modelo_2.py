@@ -1,3 +1,16 @@
+import sys
+import os
+
+# --- PARCHE UNIVERSAL (WIN/MAC/LINUX) ---
+# Obtiene la ruta absoluta del directorio raíz (dos niveles arriba: src -> modelo_ia)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+# ----------------------------------------
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -7,10 +20,9 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import os
 import mlflow
 import matplotlib.pyplot as plt
-
+from src.utils.reproducibility import set_seeds
 
 def train_lstm_rul2(
     train_path,
@@ -19,7 +31,7 @@ def train_lstm_rul2(
     sequence_length=50,
     epochs=200,
     batch_size=64,
-    model_path="lstm_rul.keras",
+    model_path="lstm_rul2.keras",
 ):
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
@@ -258,6 +270,38 @@ def train_lstm_rul2(
         mlflow.tensorflow.log_model(resultados["model"], "lstm_model")
         return resultados
 
+if __name__ == "__main__":
+    # --- BLOQUE DE EJECUCIÓN DIRECTA (Necesario para Make) ---
+    set_seeds()  # Activar reproducibilidad
+
+    print("Iniciando entrenamiento automático de LSTM...")
+
+    # Usamos try/except para capturar errores si no existen los datos
+    try:
+        # Rutas por defecto para una ejecución estándar
+        resultados = train_lstm_rul2(
+            train_path=["output/output_csv/train_FD001_filtrado.csv",
+                        "output/output_csv/train_FD002_filtrado.csv",
+                        "output/output_csv/train_FD003_filtrado.csv",
+                        "output/output_csv/train_FD004_filtrado.csv"],
+            test_path="output/data_test/test_FD002_filtrado.csv",
+            rul_path="data/raw_data/RUL_FD002.txt",
+            epochs=50,  # Pocas épocas para probar el pipeline rápido
+        )
+
+        m = resultados["metrics"]
+        print(f"\n✅ Entrenamiento completado correctamente.")
+        print(f"   MSE: {m['MSE']:.2f}")
+        print(f"   RMSE: {m['RMSE']:.2f}")
+        print(f"   R2: {m['R2']:.2f}")
+        print(f"   NASA Score: {m['NASA_Score']:.2f}")
+
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: No se encuentran los archivos de datos.")
+        print(f"   Detalle: {e}")
+        print(
+            "   -> Asegúrate de ejecutar 'make pipeline' primero para generar los CSV filtrados."
+        )
 
 # RESULTADOS
 """
