@@ -12,7 +12,7 @@ def test_run_pipeline(monkeypatch, tmp_path):
     monkeypatch.setenv("DATA_PATH_TRAIN_FD001", str(file))
     monkeypatch.setattr(os, "listdir", lambda x: [])
 
-    result1, result2 = run_pipeline(None)
+    result1, result2 = run_pipeline([None, None],)
 
     # run_pipeline devuelve una lista de DataFrames
     assert isinstance(result1, list)

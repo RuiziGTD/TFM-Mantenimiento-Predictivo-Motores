@@ -14,7 +14,7 @@ def test_procesar_varios_archivos_ok(tmp_path):
     path_test = tmp_path / "test"
     path.write_text(data)
 
-    resultados = procesar_varios_archivos(None, [str(path)], path_csv, path_test)
+    resultados = procesar_varios_archivos([None, None], [str(path)], path_csv, path_test)
 
     assert isinstance(resultados, list)
     assert len(resultados) == 1
