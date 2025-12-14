@@ -17,8 +17,3 @@ def get_health():
     return {"status": "ok"}
 
 
-# En el futuro (Fase 3), aquí añadiremos el endpoint de predicción
-# @app.post("/predict", tags=["Prediction"])
-# def predict_rul(data: ...):
-#     # Aquí llamaremos al modelo de Gabriel
-#     return {"prediction": 100}

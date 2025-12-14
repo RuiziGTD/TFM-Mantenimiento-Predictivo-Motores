@@ -15,6 +15,10 @@ setup(
         "python-dotenv",
         "tensorflow",
         "pyspark",
+        "fastapi",
+        "uvicorn",
+        "python-dotenv",
+        "pydantic",
         # añade otras que uses
     ],
     python_requires=">=3.7",
