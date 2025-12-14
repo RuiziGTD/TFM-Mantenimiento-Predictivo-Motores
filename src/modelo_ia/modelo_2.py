@@ -295,6 +295,7 @@ if __name__ == "__main__":
         print(f"   RMSE: {m['RMSE']:.2f}")
         print(f"   R2: {m['R2']:.2f}")
         print(f"   NASA Score: {m['NASA_Score']:.2f}")
+        print(resultados["predicciones"].head(10))
 
     except FileNotFoundError as e:
         print(f"\n❌ Error: No se encuentran los archivos de datos.")
@@ -305,14 +306,19 @@ if __name__ == "__main__":
 
 # RESULTADOS
 """
-{'MSE': 816.8579870879265, 'RMSE': np.float64(28.580727546511593), 'MAE': np.float64(21.71330299156513),
- 'MAPE': np.float64(37.744045961323934), 'R2': 0.7175611469539649, 'NASA_Score': np.float64(14573.410391026688)}
-
+   MSE: 671.01
+   RMSE: 25.90
+   R2: 0.77
+   NASA Score: 8881.94
    Motor  RUL_real  RUL_predicho
-0      1        18     12.647554
-0      1        18     12.647554
-1      2        79    146.435379
-2      3       106     85.773888
-3      4       110    116.111702
-4      5        15     12.081519
+0      1      18.0     23.557371
+1      2      79.0    100.564911
+2      3     106.0    121.594467
+3      4     110.0    108.830879
+4      5      15.0     21.792208
+5      6     155.0    119.715324
+6      7       6.0      5.222230
+7      8      90.0     82.437424
+8      9      11.0      9.274798
+9     10      79.0    112.077866
 """
