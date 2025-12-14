@@ -1,3 +1,13 @@
+import sys
+import os
+
+# --- PARCHE UNIVERSAL (WIN/MAC/LINUX) ---
+# Obtiene la ruta absoluta del directorio raíz (dos niveles arriba: src -> modelo_ia)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+# ----------------------------------------
+
 import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
@@ -7,7 +17,6 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error, r2_score
 from src.utils.reproducibility import set_seeds
 
-# Resto del código...
 
 def train_lstm_rul(
     train_path,
