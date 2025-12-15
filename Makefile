@@ -1,38 +1,22 @@
-# Makefile para TFM Mantenimiento Predictivo
+run-all: install run-etl train-baseline train-lstm
 
-# Variables
-# Usamos PYTHONPATH=. para que Python entienda que 'src' es un módulo
-PYTHON = PYTHONPATH=. python
-PIP = pip
-
-# 1. Instalación de dependencias
-# Usar archivo requeriments.txt en entorno Windows
 install:
-	$(PIP) install -r environment/requirements_docker.txt 
-	@echo "Dependencias instaladas."
+	pip install -r requirements.txt
 
-# 2. Ejecutar Pipeline de Datos (ETL)
-pipeline:
-	@echo "Ejecutando Pipeline de Datos..."
-	$(PYTHON) src/main.py
+run-etl:
+	@echo "🚀 Ejecutando Pipeline de Datos..."
+	python src/main.py
 
-# 3. Entrenar Modelo Base (Regresión Lineal)
 train-baseline:
-	@echo "Entrenando Baseline..."
-	$(PYTHON) src/modelo_ia/train_baseline.py
+	@echo "📈 Entrenando Baseline..."
+	python src/modelo_ia/train_baseline.py
 
-# 4. Entrenar Modelo Avanzado (LSTM)
 train-lstm:
-	@echo "Entrenando LSTM..."
-	KMP_DUPLICATE_LIB_OK=True OMP_NUM_THREADS=1 $(PYTHON) src/modelo_ia/modelo_1.py
+	@echo "🧠 Entrenando LSTM..."
+	# Mantenemos las variables de Mac por seguridad, en Windows se ignoran o no hacen daño
+	KMP_DUPLICATE_LIB_OK=True OMP_NUM_THREADS=1 python src/modelo_ia/modelo_1.py
 
-# 5. COMANDO MAESTRO
-run-all: install pipeline train-baseline train-lstm
-	@echo "¡Ciclo completo finalizado! Revisa MLflow."
-
-# Limpieza
 clean:
-	rm -rf __pycache__
-	rm -rf src/__pycache__
-	rm -rf src/modelo_ia/__pycache__
-	rm -rf .pytest_cache
+	rm -rf output/output_csv/*
+	rm -rf mlruns
+	find . -type d -name "__pycache__" -exec rm -rf {} +

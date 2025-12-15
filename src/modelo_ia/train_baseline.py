@@ -1,3 +1,13 @@
+import sys
+import os
+
+# --- PARCHE UNIVERSAL (WIN/MAC/LINUX) ---
+# Obtiene la ruta absoluta del directorio raíz (dos niveles arriba: src -> modelo_ia)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+# ----------------------------------------
+
 import pandas as pd
 import numpy as np
 import mlflow

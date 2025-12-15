@@ -1,3 +1,15 @@
+import sys
+import os
+
+# --- PARCHE UNIVERSAL (WIN/MAC/LINUX) ---
+# Obtiene la ruta absoluta del directorio raíz del proyecto (un nivel arriba de /src)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+# ----------------------------------------
+
+import argparse
+import pandas as pd
 from src.pipeline.pipeline import run_pipeline
 from src.config import *
 from src.processing.spark import spark_init
