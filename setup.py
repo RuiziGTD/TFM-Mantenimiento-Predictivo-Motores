@@ -7,7 +7,6 @@ setup(
     author="Tu Nombre",
     packages=find_packages(),
     install_requires=[
-        # Lista de dependencias - puedes leerlas de requirements.txt
         "pandas",
         "numpy", 
         "scikit-learn",
@@ -19,7 +18,9 @@ setup(
         "uvicorn",
         "python-dotenv",
         "pydantic",
-        # añade otras que uses
+        # JWT y seguridad
+        "python-jose",
+        "passlib[bcrypt]",
     ],
     python_requires=">=3.7",
 )
