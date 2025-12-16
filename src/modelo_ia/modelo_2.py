@@ -23,6 +23,13 @@ from tensorflow.keras.models import load_model
 import mlflow
 import matplotlib.pyplot as plt
 from src.utils.reproducibility import set_seeds
+import argparse
+
+# Añadir argumentos para fine-tuning
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
+args = parser.parse_args()
 
 def train_lstm_rul2(
     train_path,
@@ -169,6 +176,25 @@ def train_lstm_rul2(
         if os.path.exists(model_path):
             print("Cargando modelo guardado...")
             model = load_model(model_path)
+            if args.fine_tune:
+                optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+                model.compile(optimizer=optimizer, loss="mse")
+                
+                # congelar el entrenamiento en las ultimas 2 capas
+
+                for layer in model.layers[:-2]:
+                    layer.trainable = False
+
+                # usar solo los datos nuevos para fit
+                model.fit(
+                    X_tr, 
+                    y_tr,
+                    validation_data=(X_val, y_val),
+                    epochs=30,           # Pocas épocas para ajuste fino
+                    batch_size=batch_size,   
+                    callbacks=[early_stop, reduce_lr],
+                    verbose=1
+                )
         else:
             model.fit(
                 X_tr,
@@ -212,6 +238,11 @@ def train_lstm_rul2(
         y_test_aligned = np.array(
             [y_test[unit - 1] for unit in test_units], dtype=np.float32
         )
+
+        # Recortar RUL en test al mismo máximo que en train
+        max_rul_cap = 125
+        y_test_aligned = np.clip(y_test_aligned, a_min=None, a_max=max_rul_cap)
+
 
         # 4) Predicción
         y_pred = model.predict(X_test_seq, batch_size=64).flatten()
@@ -278,15 +309,27 @@ if __name__ == "__main__":
 
     # Usamos try/except para capturar errores si no existen los datos
     try:
-        # Rutas por defecto para una ejecución estándar
+        if args.fine_tune:
+            # Datos nuevos para fine-tuning (en este caso se usan los de train-FD004)
+            train_files = [
+                "output/output_csv/nuevos_datos.csv",
+            ]
+        else:
+            # Datos originales para entrenamiento completo
+            train_files = [
+                "output/output_csv/train_FD001_filtrado.csv",
+                "output/output_csv/train_FD002_filtrado.csv",
+                "output/output_csv/train_FD003_filtrado.csv",
+                "output/output_csv/train_FD004_filtrado.csv",
+            ]
+
         resultados = train_lstm_rul2(
-            train_path=["output/output_csv/train_FD001_filtrado.csv",
-                        "output/output_csv/train_FD002_filtrado.csv",
-                        "output/output_csv/train_FD003_filtrado.csv",
-                        "output/output_csv/train_FD004_filtrado.csv"],
+            train_path=train_files,
             test_path="output/data_test/test_FD002_filtrado.csv",
             rul_path="data/raw_data/RUL_FD002.txt",
-            epochs=50,  # Pocas épocas para probar el pipeline rápido
+            epochs=50,
+            batch_size=64,
+            model_path="lstm_rul.keras",
         )
 
         m = resultados["metrics"]
