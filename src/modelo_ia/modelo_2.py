@@ -38,7 +38,7 @@ def train_lstm_rul2(
     sequence_length=50,
     epochs=200,
     batch_size=64,
-    model_path="lstm_rul2.keras",
+    model_path="lstm_rul.keras",
 ):
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
@@ -195,6 +195,10 @@ def train_lstm_rul2(
                     callbacks=[early_stop, reduce_lr],
                     verbose=1
                 )
+
+                finetuned_model_path = "lstm_rul2.keras"
+
+                model.save(finetuned_model_path)
         else:
             model.fit(
                 X_tr,
