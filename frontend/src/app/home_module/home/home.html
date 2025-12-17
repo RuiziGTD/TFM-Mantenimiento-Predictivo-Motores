@@ -1,0 +1,10 @@
+<h2>Predicción de fallo de motor</h2>
+
+<input type="file" (change)="onFileSelected($event)" />
+
+<button (click)="predict()">Predecir</button>
+
+<div *ngIf="result">
+  <h3>Resultado</h3>
+  <pre>{{ result | json }}</pre>
+</div>
