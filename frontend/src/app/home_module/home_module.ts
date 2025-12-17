@@ -6,7 +6,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './home/home';
 
 @NgModule({
-  declarations: [HomeComponent],
   imports: [
     CommonModule,
     FormsModule,
