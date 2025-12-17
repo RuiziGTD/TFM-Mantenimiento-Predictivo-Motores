@@ -1,12 +1,4 @@
-<h2>Predicción de fallo de motor</h2>
 
-<input type="file" (change)="onFileSelected($event)" />
-
-<button (click)="predict()">Predecir</button>
-
-<div *ngIf="result">
-  <h3>Resultado</h3>
-  <pre>{{ result | json }}</pre>
 <div class="home-container">
   <header class="hero">
     <div class="hero-content">
@@ -20,7 +12,8 @@
     <label for="fileInput" class="file-label">Seleccionar archivo</label>
     <button class="btn primary" (click)="predict()">Predecir</button>
   </section>
-  <section class="result-card">
+
+  <section *ngIf="result" class="result-card">
     <h3>Resultado</h3>
     <div class="result-body">
       <pre class="result-json">{{ result | json }}</pre>

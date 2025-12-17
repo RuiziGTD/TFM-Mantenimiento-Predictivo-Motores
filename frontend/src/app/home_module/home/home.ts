@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { JsonPipe } from '@angular/common';
+import { JsonPipe, CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, HttpClientModule, JsonPipe], 
+  imports: [FormsModule, HttpClientModule, JsonPipe, CommonModule], 
 
   templateUrl: './home.html',   
   styleUrls: ['./home.css']     
