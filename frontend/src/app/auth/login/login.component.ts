@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,10 @@ export class LoginComponent {
   password = '';
   message = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onSubmit() {
     this.authService.login({
@@ -24,6 +28,7 @@ export class LoginComponent {
       next: (res) => {
         if (res.access_token) {
           localStorage.setItem('token', res.access_token);
+          this.router.navigate(['/home']);
         }
         this.message = res.message;
       },

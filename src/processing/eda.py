@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from src.config import EDA_OUTPUT
+from config import EDA_OUTPUT
 
 def view_eda(df, df_name):
     df_name = os.path.splitext(df_name)[0]  # Quitar .txt

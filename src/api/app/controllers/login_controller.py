@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.dto.login_dto import LoginRequestDTO, LoginResponseDTO
+from api.app.dto.login_dto import LoginRequestDTO, LoginResponseDTO
 
 router = APIRouter(prefix="/login", tags=["Login"])
 

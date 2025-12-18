@@ -1,0 +1,33 @@
+
+<div class="home-container">
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Predicción de fallo de motor</h1>
+      <p class="subtitle">Sube un archivo de datos y obtén la predicción de salud del motor</p>
+    </div>
+  </header>
+
+  <section class="uploader">
+    <input id="fileInput" class="file-input" type="file" (change)="onFileSelected($event)" />
+    <label for="fileInput" class="file-label">Seleccionar archivo</label>
+    <button class="btn primary" (click)="predict()">Predecir</button>
+  </section>
+
+  <section *ngIf="result" class="result-card">
+    <h3>Resultado</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Motor</th>
+          <th>Predicción RUL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of result.prediction; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ p | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -13,6 +13,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
@@ -20,9 +21,15 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import mlflow
 import matplotlib.pyplot as plt
 from src.utils.reproducibility import set_seeds
+import argparse
+
+# Añadir argumentos para fine-tuning
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
+args = parser.parse_args()
 
 def train_lstm_rul2(
     train_path,
@@ -31,8 +38,11 @@ def train_lstm_rul2(
     sequence_length=50,
     epochs=200,
     batch_size=64,
-    model_path="lstm_rul2.keras",
+    model_path="models/lstm_rul.keras",
 ):
+    
+    import mlflow
+    
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dropout, early stopping y métricas completas.
@@ -91,8 +101,11 @@ def train_lstm_rul2(
 
         # --- 3. Normalizar ---
         scaler = MinMaxScaler()
+    
         df_train[feature_cols] = scaler.fit_transform(df_train[feature_cols])
         df_test[feature_cols] = scaler.transform(df_test[feature_cols])
+
+        joblib.dump(scaler, "models/minmax_scaler.save")
 
         # --- Recortar RUL ---
 
@@ -158,8 +171,6 @@ def train_lstm_rul2(
             monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1
         )
 
-        model_path = "lstm_rul.keras"
-
         mlflow.log_param("epochs", epochs)
         mlflow.log_param("batch_size", batch_size)
         mlflow.log_param("sequence_length", sequence_length)
@@ -169,6 +180,29 @@ def train_lstm_rul2(
         if os.path.exists(model_path):
             print("Cargando modelo guardado...")
             model = load_model(model_path)
+            if args.fine_tune:
+                optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+                model.compile(optimizer=optimizer, loss="mse")
+                
+                # congelar el entrenamiento en las ultimas 2 capas
+
+                for layer in model.layers[:-2]:
+                    layer.trainable = False
+
+                # usar solo los datos nuevos para fit
+                model.fit(
+                    X_tr, 
+                    y_tr,
+                    validation_data=(X_val, y_val),
+                    epochs=30,           # Pocas épocas para ajuste fino
+                    batch_size=batch_size,   
+                    callbacks=[early_stop, reduce_lr],
+                    verbose=1
+                )
+
+                finetuned_model_path = "models/lstm_rul2.keras"
+
+                model.save(finetuned_model_path)
         else:
             model.fit(
                 X_tr,
@@ -212,6 +246,11 @@ def train_lstm_rul2(
         y_test_aligned = np.array(
             [y_test[unit - 1] for unit in test_units], dtype=np.float32
         )
+
+        # Recortar RUL en test al mismo máximo que en train
+        max_rul_cap = 125
+        y_test_aligned = np.clip(y_test_aligned, a_min=None, a_max=max_rul_cap)
+
 
         # 4) Predicción
         y_pred = model.predict(X_test_seq, batch_size=64).flatten()
@@ -270,6 +309,7 @@ def train_lstm_rul2(
         mlflow.tensorflow.log_model(resultados["model"], "lstm_model")
         return resultados
 
+# ----------------------------------------
 if __name__ == "__main__":
     # --- BLOQUE DE EJECUCIÓN DIRECTA (Necesario para Make) ---
     set_seeds()  # Activar reproducibilidad
@@ -278,15 +318,27 @@ if __name__ == "__main__":
 
     # Usamos try/except para capturar errores si no existen los datos
     try:
-        # Rutas por defecto para una ejecución estándar
+        if args.fine_tune:
+            # Datos nuevos para fine-tuning (en este caso se usan los de train-FD004)
+            train_files = [
+                "output/output_csv/nuevos_datos.csv",
+            ]
+        else:
+            # Datos originales para entrenamiento completo
+            train_files = [
+                "output/output_csv/train_FD001_filtrado.csv",
+                "output/output_csv/train_FD002_filtrado.csv",
+                "output/output_csv/train_FD003_filtrado.csv",
+                "output/output_csv/train_FD004_filtrado.csv",
+            ]
+
         resultados = train_lstm_rul2(
-            train_path=["output/output_csv/train_FD001_filtrado.csv",
-                        "output/output_csv/train_FD002_filtrado.csv",
-                        "output/output_csv/train_FD003_filtrado.csv",
-                        "output/output_csv/train_FD004_filtrado.csv"],
+            train_path=train_files,
             test_path="output/data_test/test_FD002_filtrado.csv",
             rul_path="data/raw_data/RUL_FD002.txt",
-            epochs=50,  # Pocas épocas para probar el pipeline rápido
+            epochs=50,
+            batch_size=64,
+            model_path="models/lstm_rul.keras",
         )
 
         m = resultados["metrics"]
@@ -295,6 +347,7 @@ if __name__ == "__main__":
         print(f"   RMSE: {m['RMSE']:.2f}")
         print(f"   R2: {m['R2']:.2f}")
         print(f"   NASA Score: {m['NASA_Score']:.2f}")
+        print(resultados["predicciones"].head(10))
 
     except FileNotFoundError as e:
         print(f"\n❌ Error: No se encuentran los archivos de datos.")
@@ -305,14 +358,19 @@ if __name__ == "__main__":
 
 # RESULTADOS
 """
-{'MSE': 816.8579870879265, 'RMSE': np.float64(28.580727546511593), 'MAE': np.float64(21.71330299156513),
- 'MAPE': np.float64(37.744045961323934), 'R2': 0.7175611469539649, 'NASA_Score': np.float64(14573.410391026688)}
-
+   MSE: 671.01
+   RMSE: 25.90
+   R2: 0.77
+   NASA Score: 8881.94
    Motor  RUL_real  RUL_predicho
-0      1        18     12.647554
-0      1        18     12.647554
-1      2        79    146.435379
-2      3       106     85.773888
-3      4       110    116.111702
-4      5        15     12.081519
+0      1      18.0     23.557371
+1      2      79.0    100.564911
+2      3     106.0    121.594467
+3      4     110.0    108.830879
+4      5      15.0     21.792208
+5      6     155.0    119.715324
+6      7       6.0      5.222230
+7      8      90.0     82.437424
+8      9      11.0      9.274798
+9     10      79.0    112.077866
 """
