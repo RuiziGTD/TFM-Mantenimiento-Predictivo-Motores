@@ -15,6 +15,7 @@ from src.config import *
 from src.processing.spark_utils import spark_init
 from src.utils.reproducibility import set_seeds
 import os
+from flows_prefect.flujo_retraining import flujo_retraining
 
 # Limpiamos imports de modelos (TensorFlow) para evitar el bloqueo 'mutex' en Mac.
 # El entrenamiento ahora se gestiona separadamente vía Makefile.
@@ -55,6 +56,9 @@ if __name__ == "__main__":
 
     if spark:
         spark.stop()
-        
+
+    print("\tEjecutamos el DAG.")
+    flujo_retraining()
+
     print("Pipeline de datos finalizado. Los archivos están listos en 'output/'.")
     # El entrenamiento (LSTM) se ejecutará en el siguiente paso del Makefile.

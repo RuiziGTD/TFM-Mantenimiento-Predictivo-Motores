@@ -21,12 +21,7 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import mlflow
 import matplotlib.pyplot as plt
-from src.utils.reproducibility import set_seeds
-import argparse
-
-# Añadir argumentos para fine-tuning
 from src.utils.reproducibility import set_seeds
 import argparse
 
