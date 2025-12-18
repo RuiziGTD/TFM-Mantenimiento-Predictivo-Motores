@@ -208,3 +208,17 @@ __marimo__/
 
 # MLflow local tracking files
 /mlruns
+
+# Node modules
+/frontend/node_modules/
+
+# Build output
+/frontend/dist/
+/frontend/build/
+
+# IDE
+/frontend/.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
