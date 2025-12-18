@@ -46,13 +46,6 @@ body{
 	box-shadow: 0 6px 18px rgba(6,11,33,0.6);
 	font-weight:600;
 }
-#lokura{
-
-	background: linear-gradient(90deg,#f80404,#ffd000);
-
-}
-
-
 
 .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
 .btn.primary{
