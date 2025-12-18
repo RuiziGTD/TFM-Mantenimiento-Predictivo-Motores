@@ -1,21 +1,20 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalamos dependencias
+# Copiamos requirements y código (esto ya lo tienes)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copiamos el código
 COPY . .
 
-# Exponemos el puerto 8000
 EXPOSE 8000
 
-# Lanzamos uvicorn (Servidor para FastAPI)
-# IMPORTANTE: Asumo que el archivo de Gabriel está en src/api/app.py
-# Si se llama main.py, cambia "src.api.app:app" por "src.api.main:app"
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Esto hace que Python entienda los imports de tu compañero
+ENV PYTHONPATH="${PYTHONPATH}:/app/src"
+
+# El comando de arranque 
+CMD ["uvicorn", "src.api.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
