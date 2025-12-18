@@ -6,5 +6,4 @@ matplotlib
 mlflow
 pymongo
 fastapi
-uvicorn
-tensorflow  
+uvicorn  

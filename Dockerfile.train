@@ -1,0 +1,25 @@
+# Imagen base ligera de Python
+FROM python:3.9-slim
+
+# Evitar archivos .pyc y buffers
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Instalar Make y compiladores necesarios
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    make \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Primero copiamos requirements para aprovechar la caché
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiamos todo el código
+COPY . .
+
+# Comando por defecto: Entrenar todo
+CMD ["make", "run-all"]

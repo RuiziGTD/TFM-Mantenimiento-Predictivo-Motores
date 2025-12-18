@@ -1,0 +1,29 @@
+services:
+ # 1. ENTRENADOR (Genera el modelo)
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.train
+    container_name: tfm_trainer
+    volumes:
+      - ./output:/app/output
+      - ./data:/app/data
+    # --- AÑADE ESTA LÍNEA DEBAJO ---
+    command: echo "🛑 Entrenamiento SALTADO por seguridad. Infraestructura Docker OK."
+
+  # 2. API (Consume el modelo)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: tfm_api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Lee del mismo sitio donde escribe el trainer
+      - ./output:/app/output
+    depends_on:
+      - trainer
+    environment:
+      # Variables para que la API sepa dónde buscar (opcional, si el código las usa)
+      - MODEL_PATH=/app/output/saved_models/lstm_rul.keras
