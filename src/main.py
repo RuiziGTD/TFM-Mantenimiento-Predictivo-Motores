@@ -12,7 +12,7 @@ import argparse
 import pandas as pd
 from src.pipeline.pipeline import run_pipeline
 from src.config import *
-from src.processing.spark import spark_init
+from src.processing.spark_utils import spark_init
 from src.utils.reproducibility import set_seeds
 import os
 

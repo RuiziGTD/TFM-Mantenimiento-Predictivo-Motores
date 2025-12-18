@@ -7,7 +7,6 @@ setup(
     author="Tu Nombre",
     packages=find_packages(),
     install_requires=[
-        # Lista de dependencias - puedes leerlas de requirements.txt
         "pandas",
         "numpy", 
         "scikit-learn",
@@ -15,7 +14,13 @@ setup(
         "python-dotenv",
         "tensorflow",
         "pyspark",
-        # añade otras que uses
+        "fastapi",
+        "uvicorn",
+        "python-dotenv",
+        "pydantic",
+        # JWT y seguridad
+        "python-jose",
+        "passlib[bcrypt]",
     ],
     python_requires=">=3.7",
 )

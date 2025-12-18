@@ -1,0 +1,83 @@
+
+/* You can add global styles to this file, and also import other style files */
+
+:root{
+	--bg-1:#071226;
+	--bg-2:#081124;
+	--card:#0b1220;
+	--accent:#7c3aed;
+	--accent-2:#06b6d4;
+	--muted:#94a3b8;
+}
+
+html,body{height:100%;}
+body{
+	margin:0;
+	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);
+	color:#e6eef8;
+	-webkit-font-smoothing:antialiased;
+}
+
+.home-container{
+	max-width:980px;
+	margin:48px auto;
+	padding:24px;
+}
+
+.hero{
+	background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));
+	border-radius:14px;
+	padding:28px;
+	box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+.hero-content h1{margin:0;font-size:28px;}
+.subtitle{color:var(--muted);margin-top:8px;font-size:14px}
+
+.uploader{margin-top:22px;display:flex;gap:12px;align-items:center}
+.file-input{display:none}
+.file-label{
+	display:inline-block;
+	padding:10px 16px;
+	background: linear-gradient(90deg,var(--accent),var(--accent-2));
+	color:#fff;
+	border-radius:10px;
+	cursor:pointer;
+	box-shadow: 0 6px 18px rgba(6,11,33,0.6);
+	font-weight:600;
+}
+#lokura{
+
+	background: linear-gradient(90deg,#f80404,#ffd000);
+
+}
+
+
+
+.btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+.btn.primary{
+	background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+	border: 1px solid rgba(255,255,255,0.06);
+	color:#fff;
+	transition: transform .14s ease, box-shadow .14s ease;
+}
+.btn.primary:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(12,18,40,0.6)}
+
+.result-card{
+	margin-top:20px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+	border-radius:12px;
+	padding:16px;
+	border:1px solid rgba(255,255,255,0.04);
+	box-shadow:0 8px 30px rgba(2,6,23,0.5);
+}
+.result-body{max-height:360px;overflow:auto;margin-top:8px}
+.result-json{white-space:pre-wrap;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;font-size:13px;color:#cfe8ff}
+
+@media (max-width:600px){
+	.hero{padding:20px}
+	.uploader{flex-direction:column;align-items:stretch}
+	.file-label,.btn{width:100%}
+	.home-container{margin:20px;padding:16px}
+}
+

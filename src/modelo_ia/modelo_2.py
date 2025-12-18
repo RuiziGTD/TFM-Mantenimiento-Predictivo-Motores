@@ -13,6 +13,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
@@ -26,7 +27,14 @@ from src.utils.reproducibility import set_seeds
 import argparse
 
 # Añadir argumentos para fine-tuning
+from src.utils.reproducibility import set_seeds
+import argparse
 
+# Añadir argumentos para fine-tuning
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
+args = parser.parse_args()
 parser = argparse.ArgumentParser()
 parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
 args = parser.parse_args()
@@ -38,8 +46,11 @@ def train_lstm_rul2(
     sequence_length=50,
     epochs=200,
     batch_size=64,
-    model_path="lstm_rul.keras",
+    model_path="models/lstm_rul.keras",
 ):
+    
+    import mlflow
+    
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dropout, early stopping y métricas completas.
@@ -98,8 +109,11 @@ def train_lstm_rul2(
 
         # --- 3. Normalizar ---
         scaler = MinMaxScaler()
+    
         df_train[feature_cols] = scaler.fit_transform(df_train[feature_cols])
         df_test[feature_cols] = scaler.transform(df_test[feature_cols])
+
+        joblib.dump(scaler, "models/minmax_scaler.save")
 
         # --- Recortar RUL ---
 
@@ -165,8 +179,6 @@ def train_lstm_rul2(
             monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1
         )
 
-        model_path = "lstm_rul.keras"
-
         mlflow.log_param("epochs", epochs)
         mlflow.log_param("batch_size", batch_size)
         mlflow.log_param("sequence_length", sequence_length)
@@ -196,7 +208,7 @@ def train_lstm_rul2(
                     verbose=1
                 )
 
-                finetuned_model_path = "lstm_rul2.keras"
+                finetuned_model_path = "models/lstm_rul2.keras"
 
                 model.save(finetuned_model_path)
         else:
@@ -305,6 +317,7 @@ def train_lstm_rul2(
         mlflow.tensorflow.log_model(resultados["model"], "lstm_model")
         return resultados
 
+# ----------------------------------------
 if __name__ == "__main__":
     # --- BLOQUE DE EJECUCIÓN DIRECTA (Necesario para Make) ---
     set_seeds()  # Activar reproducibilidad
@@ -333,7 +346,7 @@ if __name__ == "__main__":
             rul_path="data/raw_data/RUL_FD002.txt",
             epochs=50,
             batch_size=64,
-            model_path="lstm_rul.keras",
+            model_path="models/lstm_rul.keras",
         )
 
         m = resultados["metrics"]
@@ -358,6 +371,16 @@ if __name__ == "__main__":
    R2: 0.77
    NASA Score: 8881.94
    Motor  RUL_real  RUL_predicho
+0      1      18.0     23.557371
+1      2      79.0    100.564911
+2      3     106.0    121.594467
+3      4     110.0    108.830879
+4      5      15.0     21.792208
+5      6     155.0    119.715324
+6      7       6.0      5.222230
+7      8      90.0     82.437424
+8      9      11.0      9.274798
+9     10      79.0    112.077866
 0      1      18.0     23.557371
 1      2      79.0    100.564911
 2      3     106.0    121.594467
