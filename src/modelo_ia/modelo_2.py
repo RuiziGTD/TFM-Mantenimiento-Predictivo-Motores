@@ -35,9 +35,6 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
 args = parser.parse_args()
-parser = argparse.ArgumentParser()
-parser.add_argument("--fine-tune", action="store_true", help="Entrena sobre datos nuevos")
-args = parser.parse_args()
 
 def train_lstm_rul2(
     train_path,
@@ -371,16 +368,6 @@ if __name__ == "__main__":
    R2: 0.77
    NASA Score: 8881.94
    Motor  RUL_real  RUL_predicho
-0      1      18.0     23.557371
-1      2      79.0    100.564911
-2      3     106.0    121.594467
-3      4     110.0    108.830879
-4      5      15.0     21.792208
-5      6     155.0    119.715324
-6      7       6.0      5.222230
-7      8      90.0     82.437424
-8      9      11.0      9.274798
-9     10      79.0    112.077866
 0      1      18.0     23.557371
 1      2      79.0    100.564911
 2      3     106.0    121.594467
