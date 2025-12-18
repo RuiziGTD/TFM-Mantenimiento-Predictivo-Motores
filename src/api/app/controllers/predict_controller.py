@@ -3,7 +3,7 @@ import tempfile
 from tensorflow.keras.models import load_model
 from config import CARPETA_OUTPUT_CSV, CARPETA_OUTPUT_DATA_TEST
 import numpy as np
-from modelo_ia.modelo_2 import predict_rul
+from modelo_ia.predict_api import predict_rul
 
 from processing.cleaning import identificar_sensores_irrelevantes_y_guardar
 from fastapi import APIRouter, UploadFile, File, HTTPException

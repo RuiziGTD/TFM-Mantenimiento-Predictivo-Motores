@@ -1,5 +1,5 @@
 from unittest.mock import patch, MagicMock
-from src.processing.spark import spark_data_lake, spark_init
+from src.processing.spark_utils import spark_data_lake, spark_init
 import pytest
 
 # TEST 9: Comprobar el correcto funcionamiento del inició de sesión Spark

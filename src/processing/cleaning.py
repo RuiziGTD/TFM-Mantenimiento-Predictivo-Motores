@@ -1,5 +1,4 @@
 from utils.logger import get_logger  # Obtain logs
-from processing.spark import spark_data_lake
 from processing.eda import view_eda
 import pandas as pd
 import os
@@ -105,6 +104,7 @@ def identificar_sensores_irrelevantes_y_guardar(
 
     # Cargar en Spark si corresponde
     if spark:
+        from src.processing.spark_utils import spark_data_lake
         spark_data_lake(spark, df_filtered, path_txt)
     return df_filtered
 

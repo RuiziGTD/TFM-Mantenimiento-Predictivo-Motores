@@ -21,7 +21,6 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import mlflow
 import matplotlib.pyplot as plt
 from src.utils.reproducibility import set_seeds
 import argparse
@@ -41,6 +40,9 @@ def train_lstm_rul2(
     batch_size=64,
     model_path="models/lstm_rul.keras",
 ):
+    
+    import mlflow
+    
     """
     Entrena un modelo LSTM para predecir RUL usando secuencias de ciclos.
     Incluye padding automático, dropout, early stopping y métricas completas.
@@ -99,9 +101,11 @@ def train_lstm_rul2(
 
         # --- 3. Normalizar ---
         scaler = MinMaxScaler()
-        joblib.dump(scaler, "models/minmax_scaler.save")
+    
         df_train[feature_cols] = scaler.fit_transform(df_train[feature_cols])
         df_test[feature_cols] = scaler.transform(df_test[feature_cols])
+
+        joblib.dump(scaler, "models/minmax_scaler.save")
 
         # --- Recortar RUL ---
 
@@ -304,34 +308,6 @@ def train_lstm_rul2(
         # Guardar modelo
         mlflow.tensorflow.log_model(resultados["model"], "lstm_model")
         return resultados
-    
-def predict_rul(df, model_path="models/lstm_rul.keras", sequence_length=50):
-    feature_cols = [
-        "op_setting_1","op_setting_2","op_setting_3","T24","T30","T50",
-        "P30","Nf","Nc","Ps30","phi","NRf","NRc","BPR","htBleed","W31","W32"
-    ]
-
-    # 1) Normalizar con scaler guardado
-
-    scaler = joblib.load("models/minmax_scaler.save")
-    df[feature_cols] = scaler.transform(df[feature_cols])
-
-    # 2) Crear secuencias
-    test_units = df["unit_number"].unique()
-    test_units.sort()
-    X_test_seq = []
-    for unit in test_units:
-        unit_data = df[df["unit_number"] == unit][feature_cols].values
-        if len(unit_data) < sequence_length:
-            pad = np.zeros((sequence_length - len(unit_data), unit_data.shape[1]))
-            unit_data = np.vstack([pad, unit_data])
-        X_test_seq.append(unit_data[-sequence_length:])
-    X_test_seq = np.array(X_test_seq)
-
-    # 3) Cargar modelo y predecir
-    model = load_model(model_path)
-    y_pred = model.predict(X_test_seq, batch_size=64).flatten()
-    return y_pred
 
 # ----------------------------------------
 if __name__ == "__main__":
