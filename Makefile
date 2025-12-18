@@ -1,7 +1,7 @@
 run-all: install run-etl train-baseline train-lstm
 
 install:
-	pip install -r requirements.txt
+	pip install -r environment/requirements.txt
 
 run-etl:
 	@echo "🚀 Ejecutando Pipeline de Datos..."

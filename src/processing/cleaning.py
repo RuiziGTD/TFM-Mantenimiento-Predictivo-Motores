@@ -1,6 +1,6 @@
-from src.utils.logger import get_logger  # Obtain logs
-from src.processing.spark import spark_data_lake
-from src.processing.eda import view_eda
+from utils.logger import get_logger  # Obtain logs
+from processing.spark import spark_data_lake
+from processing.eda import view_eda
 import pandas as pd
 import os
 
@@ -88,10 +88,8 @@ def identificar_sensores_irrelevantes_y_guardar(
     elif "test" in filename_raw:
         output_dir = CARPETA_OUTPUT_DATA_TEST
     else:
-        raise ValueError(
-            f"No se reconoce si el archivo es train o test: {filename_raw}"
-        )
-
+        print("Filtered df won't be saved")
+        return df_filtered
     # Crear carpeta si no existe
     os.makedirs(output_dir, exist_ok=True)
 

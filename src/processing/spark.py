@@ -1,8 +1,8 @@
 from pyspark.sql import SparkSession
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
-from src.utils.logger import get_logger
-from src.config import PARQUET_OUTPUT
+from utils.logger import get_logger
+from config import PARQUET_OUTPUT
 import os, sys
 
 logger = get_logger(__name__)

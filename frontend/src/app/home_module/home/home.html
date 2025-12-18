@@ -15,8 +15,19 @@
 
   <section *ngIf="result" class="result-card">
     <h3>Resultado</h3>
-    <div class="result-body">
-      <pre class="result-json">{{ result | json }}</pre>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Motor</th>
+          <th>Predicción RUL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of result.prediction; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ p | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 </div>
