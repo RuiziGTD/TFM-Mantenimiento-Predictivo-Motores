@@ -1,0 +1,8 @@
+__pycache__
+*.pyc
+venv
+.git
+.gitignore
+mlruns
+output/output_csv/*
+output/saved_models/*

@@ -7,4 +7,6 @@ mlflow
 pymongo
 fastapi
 uvicorn
-tensorflow  
+tensorflow
+python-multipart  
+prometheus-fastapi-instrumentator
