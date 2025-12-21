@@ -1,11 +1,9 @@
-# Imagen base ligera de Python
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Evitar archivos .pyc y buffers
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Instalar Make y compiladores necesarios
+# Dependencias mínimas
 RUN apt-get update && apt-get install -y \
     build-essential \
     make \
@@ -14,12 +12,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Primero copiamos requirements para aprovechar la caché
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiamos todo el código
 COPY . .
 
-# Comando por defecto: Entrenar todo
-CMD ["make", "run-all"]
+ENV PYTHONPATH="${PYTHONPATH}:/app/src"
+
+# AHORA SÍ: Ejecución directa sin trucos raros
+CMD ["python", "src/modelo_ia/modelo_2.py"]

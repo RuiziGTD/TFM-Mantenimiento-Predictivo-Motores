@@ -5,16 +5,13 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Copiamos requirements y código (esto ya lo tienes)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-EXPOSE 8000
-
-
-# Esto hace que Python entienda los imports de tu compañero
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 
-# El comando de arranque 
+EXPOSE 8000
+
+# Fíjate: Solo hay UN "CMD" al principio de la línea
 CMD ["uvicorn", "src.api.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

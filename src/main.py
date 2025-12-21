@@ -12,11 +12,10 @@ import argparse
 import pandas as pd
 from src.pipeline.pipeline import run_pipeline
 from src.config import *
-from src.processing.spark_utils import spark_init
+# from src.processing.spark_utils import spark_init -> de momento no lo usamos.
 from src.utils.reproducibility import set_seeds
 import os
 
-# Limpiamos imports de modelos (TensorFlow) para evitar el bloqueo 'mutex' en Mac.
 # El entrenamiento ahora se gestiona separadamente vía Makefile.
 
 if __name__ == "__main__":
@@ -32,22 +31,14 @@ if __name__ == "__main__":
     # Si quieres que el Makefile no se detenga, podrías forzar 'n' o leer argumentos.
     # De momento mantenemos tu lógica original.
     
-    spark_choice = None
-    while spark_choice not in ("y", "n"):
-        spark_choice = input(
-            "¿Quieres usar spark? (y/n): "
-        ).lower()
-        if spark_choice not in ("y", "n"):
-            print("Carácter no reconocido.")
-    
-    eda_choice = input(
-            "¿Quieres crear un EDA? (Y/n): "
-        ).lower()
+    spark_choice = 'n'
+    eda_choice = 'n'
 
-    spark = spark_init() if spark_choice == "y" else None
+    # Como es 'n', pasamos None directamente y evitamos llamar a spark_init
+    spark = None
     eda = "y" if eda_choice != "n" else None
 
-    params = [spark, eda]
+    params = [spark, eda]  
 
     # 3. Ejecutar SOLO el Pipeline de Datos
     print("Iniciando Pipeline de Datos...")
