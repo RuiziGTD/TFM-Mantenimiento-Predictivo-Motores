@@ -21,7 +21,9 @@ setup(
         # JWT y seguridad
         "python-jose",
         "passlib[bcrypt]",
-        "prefect"
+        "prefect",
+        "python-multipart",
+        "python-dotenv"
     ],
     python_requires=">=3.7",
 )

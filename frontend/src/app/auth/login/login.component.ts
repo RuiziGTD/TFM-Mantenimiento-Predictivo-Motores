@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // ← Import necesario
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],   // ← OBLIGATORIO
+  imports: [FormsModule, CommonModule], // ← Añadir CommonModule
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -19,6 +20,7 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {}
+
 
   onSubmit() {
     this.authService.login({
@@ -33,7 +35,11 @@ export class LoginComponent {
         this.message = res.message;
       },
       error: (err) => {
-        this.message = err.error?.detail || 'Credenciales incorrectas';
+        if (err.status === 422) {
+          this.message = 'Usuario y contraseña no pueden estar vacíos';
+        } else {
+          this.message = err.error?.detail || 'Credenciales incorrectas';
+        }
       }
     });
   }

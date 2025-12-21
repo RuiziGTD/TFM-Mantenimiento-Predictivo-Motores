@@ -1,8 +1,18 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class LoginRequestDTO(BaseModel):
-    username: str
-    password: str
+    username: str = Field(
+        ...,
+        min_length=1,
+        max_length=20,
+        description="Usuario (1–20 caracteres)"
+    )
+    password: str = Field(
+        ...,
+        min_length=1,
+        max_length=20,
+        description="Contraseña (1–20 caracteres)"
+    )
 
 
 class LoginResponseDTO(BaseModel):
