@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
- # 1. ENTRENADOR (Genera el modelo)
+  # 1. ENTRENADOR (Genera el modelo)
   trainer:
     build:
       context: .
@@ -8,8 +10,8 @@ services:
     volumes:
       - ./output:/app/output
       - ./data:/app/data
-    # --- AÑADE ESTA LÍNEA DEBAJO ---
-    command: echo "🛑 Entrenamiento SALTADO por seguridad. Infraestructura Docker OK."
+      - ./models:/app/models
+    
 
   # 2. API (Consume el modelo)
   api:
@@ -20,10 +22,12 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Lee del mismo sitio donde escribe el trainer
+      # 1. Para leer los datos de test si los necesita
       - ./output:/app/output
+      - ./data:/app/data
+      - ./models:/app/models
     depends_on:
       - trainer
     environment:
-      # Variables para que la API sepa dónde buscar (opcional, si el código las usa)
-      - MODEL_PATH=/app/output/saved_models/lstm_rul.keras
+      # CORREGIDO: Ahora el modelo está en /app/models, no en output
+      - MODEL_PATH=/app/models/lstm_rul.keras
