@@ -8,11 +8,17 @@ from modelo_ia.predict_api import predict_rul
 from processing.cleaning import identificar_sensores_irrelevantes_y_guardar
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
+from api.logs.logging_config import get_logger
+
+logger = get_logger("predict_controller")
 
 router = APIRouter(prefix="/predict", tags=["Predict"])
 
 @router.post("", response_class=JSONResponse)
 async def predict(file: UploadFile = File(...)):
+
+    logger.info(f"Predicción solicitada: filename='{file.filename}'")
+
     try:
         contents = await file.read()
 
@@ -34,8 +40,9 @@ async def predict(file: UploadFile = File(...)):
         print("Realizando predicción...")
 
         y_pred = predict_rul(df)
-
+        logger.info(f"Predicción exitosa: prediccion='{y_pred.tolist()}'")
         return {"prediction": y_pred.tolist()}
 
     except Exception as e:
+        logger.error(f"Error en predicción: filename='{file.filename}', error={e}")
         raise HTTPException(status_code=500, detail=str(e))

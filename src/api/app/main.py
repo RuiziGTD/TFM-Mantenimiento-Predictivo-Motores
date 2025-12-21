@@ -5,6 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.app.controllers.login_controller import router as login_router
 from api.app.controllers.predict_controller import router as predict_router
+from api.logs.logging_config import get_logger
+
+logger = get_logger("main")
 
 app = FastAPI()
 
@@ -18,3 +21,5 @@ app.add_middleware(
 
 app.include_router(login_router)
 app.include_router(predict_router)
+
+logger.info("API iniciada correctamente.")
