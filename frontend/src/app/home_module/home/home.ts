@@ -19,10 +19,12 @@ export class HomeComponent {
 
   chart: Chart | undefined;
 
-  @ViewChild('healthChart')
-  chartRef!: ElementRef<HTMLCanvasElement>;
+  filteredMotors: any[] = [];
+  selectedStatus: string | null = null;
 
-  constructor(private http: HttpClient, private cd: ChangeDetectorRef) {}
+  @ViewChild('healthChart') chartRef!: ElementRef<HTMLCanvasElement>;
+
+  constructor(private http: HttpClient, private cd: ChangeDetectorRef) {} // ← Injectamos ChangeDetectorRef
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
@@ -39,10 +41,9 @@ export class HomeComponent {
         next: (res: any) => {
           this.result = res;
 
-          // 🔹 Fuerza que Angular detecte los cambios inmediatamente
+          // Forzamos repaint y detección de cambios
           this.cd.detectChanges();
 
-          // 🔹 Crear el gráfico después de que Angular haya actualizado la vista
           this.createHealthChart();
         },
         error: err => console.error(err)
@@ -50,11 +51,8 @@ export class HomeComponent {
   }
 
   createHealthChart() {
-    if (!this.result?.dashboard?.overview) return;
-
     const overview = this.result.dashboard.overview;
 
-    // Si ya existe, destruye el gráfico
     if (this.chart) {
       this.chart.destroy();
     }
@@ -70,14 +68,28 @@ export class HomeComponent {
             overview.warning_units,
             overview.critical_units
           ],
-          backgroundColor: ['#10b981', '#facc15', '#ef4444']
+          backgroundColor: ['#16a34a', '#facc15', '#dc2626']
         }]
       },
       options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        },
+        onClick: (evt, elements) => {
+          if (!elements.length) return;
+          const index = elements[0].index;
+          const statusMap = ['OK', 'AVISO', 'CRITICO'];
+          this.selectedStatus = statusMap[index];
+          this.filterMotorsByStatus(this.selectedStatus);
+          this.cd.detectChanges(); // ← Fuerza actualización
+        }
       }
     });
+  }
+
+  filterMotorsByStatus(status: string) {
+    this.filteredMotors = this.result.dashboard.units.filter((u: any) => u.status.toUpperCase() === status);
   }
 }

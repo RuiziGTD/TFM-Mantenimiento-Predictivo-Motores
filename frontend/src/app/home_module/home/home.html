@@ -1,4 +1,4 @@
-<div class="home-container">
+<div class="home-container"> 
   <header class="hero">
     <div class="hero-content">
       <h1>Predicción de fallo de motor</h1>
@@ -6,37 +6,32 @@
     </div>
   </header>
 
+  <!-- Subida de archivo -->
   <section class="uploader">
     <input id="fileInput" class="file-input" type="file" (change)="onFileSelected($event)" />
     <label for="fileInput" class="file-label">Seleccionar archivo</label>
     <button class="btn primary" (click)="predict()">Predecir</button>
   </section>
 
-  <div *ngIf="result" class="result-card">
-    <h2>Estado de Salud de los Motores</h2>
-    <canvas #healthChart></canvas>
-  </div>
+  <!-- Dashboard 2x2 -->
+  <div class="dashboard-grid" *ngIf="result">
+    <!-- Panel 1: Estado de salud -->
+    <div class="result-card panel">
+      <h2>Estado de Salud de los Motores</h2>
+      <canvas #healthChart></canvas>
+    </div>
 
-  <section *ngIf="result" class="result-card">
-    <h3>Resultado</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Motor</th>
-          <th>Predicción RUL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let p of result.prediction; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ p | number:'1.2-2' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <div *ngIf="result" class="result-card">
-    <h2>Estado de Salud de los Motores</h2>
-    <canvas #healthChart></canvas>
+    <!-- Panel 2: Lista filtrada por estado -->
+    <div class="result-card panel">
+      <h2>Motores {{ selectedStatus || '' }}</h2>
+      <ul *ngIf="filteredMotors.length > 0; else emptyMessage">
+        <li *ngFor="let motor of filteredMotors">
+          ID: {{ motor.unit_id }} | RUL: {{ motor.rul | number:'1.0-0' }}
+        </li>
+      </ul>
+      <ng-template #emptyMessage>
+        <p class="muted">Haz clic en una barra del gráfico para filtrar motores</p>
+      </ng-template>
+    </div>
   </div>
 </div>
