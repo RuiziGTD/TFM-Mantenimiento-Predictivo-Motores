@@ -139,24 +139,25 @@ def train_lstm_rul2(
         mlflow.log_param("epochs", epochs)
         mlflow.log_param("batch_size", batch_size)
 
-        if os.path.exists(model_path) and args.fine_tune:
+        if os.path.exists(model_path):
             print("Cargando modelo guardado para Fine Tuning...")
             model = load_model(model_path)
-            optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
-            model.compile(optimizer=optimizer, loss="mse")
+            if args.fine_tune:
+                optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+                model.compile(optimizer=optimizer, loss="mse")
             
-            for layer in model.layers[:-2]:
-                layer.trainable = False
+                for layer in model.layers[:-2]:
+                    layer.trainable = False
 
-            model.fit(
-                X_tr, y_tr,
-                validation_data=(X_val, y_val),
-                epochs=30,
-                batch_size=batch_size,
-                callbacks=[early_stop, reduce_lr],
-                verbose=1
-            )
-            model.save("models/lstm_rul2.keras")
+                model.fit(
+                    X_tr, y_tr,
+                    validation_data=(X_val, y_val),
+                    epochs=30,
+                    batch_size=batch_size,
+                    callbacks=[early_stop, reduce_lr],
+                    verbose=1
+                )
+                model.save("models/lstm_rul2.keras")
 
         else:
             # Entrenamiento desde cero
