@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s  # Prometheus mirará la API cada 5 segundos
+
+scrape_configs:
+  - job_name: 'fastapi_metricas'
+    metrics_path: '/metrics'
+    static_configs:
+      # 'api' es el nombre del servicio en docker-compose
+      # '8000' es el puerto interno del contenedor
+      - targets: ['tfm_api:8000']

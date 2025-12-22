@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # 1. ENTRENADOR (Genera el modelo)
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.train
+    container_name: tfm_trainer
+    volumes:
+      - ./output:/app/output
+      - ./data:/app/data
+      - ./models:/app/models
+
+  # 2. API (Consume el modelo)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: tfm_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./output:/app/output
+      - ./data:/app/data
+      - ./models:/app/models
+    depends_on:
+      - trainer
+    environment:
+      - MODEL_PATH=/app/models/lstm_rul.keras
+
+  # 3. PROMETHEUS (Recolector de Métricas)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus_container
+    volumes:
+      # Mapeamos el archivo de configuración que acabas de crear
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  # 4. GRAFANA (Visualizador)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_container
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+# Volúmenes para que Grafana no pierda los datos al reiniciar
+volumes:
+  grafana_data:
