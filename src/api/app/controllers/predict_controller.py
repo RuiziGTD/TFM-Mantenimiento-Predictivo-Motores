@@ -5,14 +5,19 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 import io
-import osfrom api.logs.logging_config import get_logger
+import os
+from pathlib import Path
+from api.logs.logging_config import get_logger
+from api.app.services.dashboard_service import DashboardService
 logger = get_logger("predict_controller")
 
 router = APIRouter(prefix="/predict", tags=["Predict"])
 
 # --- CONFIGURACIÓN ---
-MODEL_PATH = '/app/models/lstm_rul.keras'
-SCALER_PATH = '/app/models/minmax_scaler.save'
+CURRENT_DIR = Path(__file__).resolve().parent
+SRC_DIR = CURRENT_DIR.parents[2] # CUIDADO CON LAS RUTAS
+MODEL_PATH = SRC_DIR.parent / "models" / "lstm_rul.keras"
+SCALER_PATH = SRC_DIR.parent / "models" / "minmax_scaler.save"
 SEQUENCE_LENGTH = 50 
 # Columnas esperadas en el dataset C-MAPSS
 FEATURE_COLS = [
@@ -113,11 +118,23 @@ async def predict(file: UploadFile = File(...)):
 
         # 6. PREDICCIÓN
         predictions = model.predict(X_final)
-        logger.info(f"Predicción exitosa: prediccion='{y_pred.tolist()}'")
-        return {"prediction": predictions.flatten().tolist()}
+        logger.info(f"Predicción exitosa: prediccion='{predictions.tolist()}'")
+        #return {"prediction": predictions.flatten().tolist()}
+        dashboard_view = DashboardService.build_health_view(units, predictions)
+
+        return {
+            "prediction": predictions.flatten().tolist(),
+            "dashboard": dashboard_view
+        }
 
     except Exception as e:
 
-        logger.error(f"Error en predicción: filename='{file.filename}', error={e}")        # Log del error real para el desarrollador
+        logger.error(f"Error en predicción: filename='{file.filename}', error={e}")
+
+        logger.info(f"MODEL_PATH = {MODEL_PATH}")
+        logger.info(f"MODEL exists = {MODEL_PATH.exists()}")
+        logger.info(f"SCALER_PATH = {SCALER_PATH}")
+        logger.info(f"SCALER exists = {SCALER_PATH.exists()}")
+
         print(f"Error en /predict: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")

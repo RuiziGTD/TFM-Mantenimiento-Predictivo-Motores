@@ -12,6 +12,11 @@
     <button class="btn primary" (click)="predict()">Predecir</button>
   </section>
 
+  <div *ngIf="result" class="result-card">
+    <h2>Estado de Salud de los Motores</h2>
+    <canvas #healthChart></canvas>
+  </div>
+
   <section *ngIf="result" class="result-card">
     <h3>Resultado</h3>
     <table>
@@ -29,4 +34,9 @@
       </tbody>
     </table>
   </section>
+
+  <div *ngIf="result" class="result-card">
+    <h2>Estado de Salud de los Motores</h2>
+    <canvas #healthChart></canvas>
+  </div>
 </div>

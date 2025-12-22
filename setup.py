@@ -23,7 +23,8 @@ setup(
         "passlib[bcrypt]",
         "prefect",
         "python-multipart",
-        "python-dotenv"
+        "python-dotenv",
+        "prometheus-fastapi-instrumentator"
     ],
     python_requires=">=3.7",
 )
