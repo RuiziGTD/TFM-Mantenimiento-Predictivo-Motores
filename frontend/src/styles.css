@@ -153,3 +153,23 @@ body{
     grid-template-columns: 1fr;
   }
 }
+
+.table-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.table-controls input,
+.table-controls select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #e6eef8;
+}
+
+.panel.full-width {
+  grid-column: span 2; /* Ocupa las dos columnas */
+}
