@@ -10,8 +10,8 @@ import os
 router = APIRouter(prefix="/predict", tags=["Predict"])
 
 # --- CONFIGURACIÓN ---
-MODEL_PATH = '/app/models/lstm_rul.keras'
-SCALER_PATH = '/app/models/minmax_scaler.save'
+MODEL_PATH = '../models/lstm_rul.keras'
+SCALER_PATH = '../models/minmax_scaler.save'
 SEQUENCE_LENGTH = 50 
 # Columnas esperadas en el dataset C-MAPSS
 FEATURE_COLS = [
@@ -19,10 +19,20 @@ FEATURE_COLS = [
     "T2", "T24", "T30", "T50", "P2", "P15", "P30", "Nf", "Nc", "epr", "Ps30", "phi",
     "NRf", "NRc", "BPR", "farB", "htBleed", "Nf_dmd", "PCNfR_dmd", "W31", "W32"
 ]
+MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
+ALLOWED_TYPES = {"text/csv", "text/plain"}
 
 @router.post("", response_class=JSONResponse)
 async def predict(file: UploadFile = File(...)):
     try:
+        if file.content_type not in ALLOWED_TYPES:
+            raise HTTPException(
+                status_code=400,
+                detail="Tipo de archivo no soportado. Use CSV o TXT."
+            )
+        if file.size and file.size > MAX_FILE_SIZE:
+            raise HTTPException(413, "Archivo demasiado grande")
+        
         # 1. VALIDACIÓN DE RUTAS
         if not os.path.exists(MODEL_PATH) or not os.path.exists(SCALER_PATH):
             raise HTTPException(status_code=500, detail="Modelos no encontrados en el servidor.")
