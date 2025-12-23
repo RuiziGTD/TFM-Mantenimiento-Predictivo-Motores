@@ -1,15 +1,30 @@
-<div class="login-container">
-  <h2>Login</h2>
-  <form (ngSubmit)="onSubmit()">
-    <div>
-      <label>Usuario:</label>
-      <input type="text" [(ngModel)]="username" name="username" required>
+<div class="home-container">
+  <div class="hero login-container">
+    <h2>Login</h2>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate class="login-form">
+      <input
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Usuario"
+        required
+        class="input-field"
+      >
+
+      <input
+        [(ngModel)]="password"
+        name="password"
+        type="password"
+        placeholder="Contraseña"
+        required
+        class="input-field"
+      >
+
+      <button type="submit" class="btn primary">Login</button>
+    </form>
+
+    <div class="error" *ngIf="message">
+      {{ message }}
     </div>
-    <div>
-      <label>Contraseña:</label>
-      <input type="password" [(ngModel)]="password" name="password" required>
-    </div>
-    <button type="submit">Entrar</button>
-  </form>
-  <p>{{ message }}</p>
+  </div>
 </div>

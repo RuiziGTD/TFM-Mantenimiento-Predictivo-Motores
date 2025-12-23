@@ -21,7 +21,10 @@ setup(
         # JWT y seguridad
         "python-jose",
         "passlib[bcrypt]",
-        "prefect"
+        "prefect",
+        "python-multipart",
+        "python-dotenv",
+        "prometheus-fastapi-instrumentator"
     ],
     python_requires=">=3.7",
 )
