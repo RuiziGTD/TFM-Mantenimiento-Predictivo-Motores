@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from src.api.main import app  # Importa tu app de FastAPI
+from src.api.app.main import app  # Importa tu app de FastAPI
 
 # TEST 6 - Test del Endpoint de salud de la API
 client = TestClient(app)

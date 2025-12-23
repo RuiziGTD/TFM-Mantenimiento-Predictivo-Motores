@@ -23,6 +23,11 @@ app.add_middleware(
 app.include_router(login_router)
 app.include_router(predict_router)
 
+# Endpoint de salud
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 logger.info("API iniciada correctamente.")
 # 2. ACTIVAR EL MONITOR
 # Esto crea el endpoint /metrics automáticamente para que Prometheus pueda leerlo
