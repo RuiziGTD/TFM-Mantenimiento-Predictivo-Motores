@@ -5,7 +5,11 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY requirements.txt .
+# --- CAMBIO IMPORTANTE ---
+# Antes: COPY requirements.txt .
+# Ahora: Apuntamos a la carpeta environment donde estás guardando las cosas
+COPY environment/requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
@@ -13,5 +17,4 @@ ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 
 EXPOSE 8000
 
-# Fíjate: Solo hay UN "CMD" al principio de la línea
 CMD ["uvicorn", "src.api.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

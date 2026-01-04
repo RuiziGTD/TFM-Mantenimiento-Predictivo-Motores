@@ -1,19 +1,18 @@
 version: '3.8'
 
 services:
-  # --- 1. FRONTEND (Angular) ---
-  # Añadido para que la web funcione en Docker
+  # --- 1. FRONTEND ---
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: tfm_frontend
     ports:
-      - "4200:80" # Mapeamos puerto 80 del contenedor al 4200 de tu Mac
+      - "4200:80"
     depends_on:
       - api
 
-  # --- 2. API  ---
+  # --- 2. API ---
   api:
     build:
       context: .
@@ -22,12 +21,10 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./models:/app/models 
+      - ./models:/app/models
       - ./logs:/app/logs
     environment:
-      # RUTA DEL MODELO
       - MODEL_PATH=/app/models/lstm_rul.keras
-     
 
   # --- 3. PROMETHEUS ---
   prometheus:
@@ -53,18 +50,22 @@ services:
     depends_on:
       - prometheus
 
-  # EXTRA: El trainer se queda aquí por si se quiere ejecutar manualmente, 
-  # pero no bloquea el inicio automático.
+  # --- 5. TRAINER (Tu salvavidas para el Mac) ---
   trainer:
     build:
       context: .
-      dockerfile: Dockerfile.train
+      # Usamos el Dockerfile de la API porque ya tiene las librerías necesarias
+      dockerfile: Dockerfile.api 
     container_name: tfm_trainer
     volumes:
-      - ./output:/app/output
+      # Mapeamos TODO para que el código y los datos se guarden en tu Mac
+      - ./src:/app/src
       - ./data:/app/data
+      - ./output:/app/output
       - ./models:/app/models
-    profiles: ["training"] # Esto hace que solo arranque si lo pides explícitamente
+      - ./mlruns:/app/mlruns
+    # Este perfil oculta el servicio para que no arranque con la web, solo cuando lo llame el Makefile
+    profiles: ["training"] 
 
 volumes:
   grafana_data:

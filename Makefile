@@ -1,55 +1,54 @@
 # ==========================================
-#  TFM FASE 4 - ORQUESTADOR FINAL
+#  TFM FASE 4 - ORQUESTADOR FINAL (DOCKER)
 # ==========================================
 
 .PHONY: all help install run-etl train-baseline train-lstm serve-docker run-all stop clean
 
-# --- RUTAS ---
-BACKEND_DIR = src
-FRONTEND_DIR = frontend
-REQ_FILE = environment/requirements.txt
+# --- CONFIGURACIÓN ---
+# Usamos el servicio 'trainer' para ejecutar scripts sin bloquear el Mac
+DOCKER_RUN = docker-compose run --rm trainer
 
-# --- 1. COMANDOS BÁSICOS ---
+# --- 1. AYUDA ---
 help:
 	@echo "Comandos TFM:"
-	@echo "  make install       - Instala dependencias (Python)"
-	@echo "  make run-all       - Ejecuta el flujo completo (ETL + Entreno + Docker)"
+	@echo "  make install       - Construye la imagen Docker (Necesario la primera vez)"
+	@echo "  make run-all       - EJECUTA TODO (ETL + Entreno + Web) Automáticamente"
 	@echo "  make stop          - Detiene los contenedores (Mantiene datos)"
-	@echo "  make clean         - Limpieza total (Borra datos y contenedores)"
+	@echo "  make clean         - Borra datos y contenedores"
 
 install:
-	@echo "📦 Instalando dependencias..."
-	pip install -r $(REQ_FILE)
+	@echo "🐳 Preparando el entorno blindado (Docker)..."
+	docker-compose build trainer
 
-# --- 2. EL FLUJO DE ENTRENAMIENTO (LOCAL) ---
+# --- 2. COMANDOS INTERNOS (Corren en Docker automáticamente) ---
 run-etl:
-	@echo "🚀 [1/3] Procesando Datos (ETL)..."
-	# Configuración de compatibilidad para ejecución local en macOS
-	OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES KMP_DUPLICATE_LIB_OK=True OMP_NUM_THREADS=1 python src/main.py
+	@echo "🚀 [1/3] Procesando Datos (Ejecutando en contenedor seguro)..."
+	$(DOCKER_RUN) python src/main.py
 
 train-baseline:
-	@echo "📈 [2/3] Entrenando Baseline (Regresión Lineal)..."
-	python src/modelo_ia/train_baseline.py
+	@echo "📈 [2/3] Entrenando Baseline (Ejecutando en contenedor seguro)..."
+	$(DOCKER_RUN) python src/modelo_ia/train_baseline.py
 
 train-lstm:
-	@echo "🧠 [3/3] Entrenando LSTM (Red Neuronal)..."
-	KMP_DUPLICATE_LIB_OK=True OMP_NUM_THREADS=1 python src/modelo_ia/modelo_2.py
+	@echo "🧠 [3/3] Entrenando LSTM (Ejecutando en contenedor seguro)..."
+	$(DOCKER_RUN) python src/modelo_ia/modelo_2.py
 
-# --- 3. DESPLIEGUE EN DOCKER ---
+# --- 3. DESPLIEGUE ---
 serve-docker:
 	@echo "🐳 Levantando Arquitectura Completa..."
-	docker-compose up -d --build --remove-orphans
+	# Levantamos todos los servicios en segundo plano
+	docker-compose up -d frontend api prometheus grafana
 	@echo ""
 	@echo "✅ SISTEMA ONLINE:"
-	@echo "   -> Frontend App:       http://localhost:4200"
-	@echo "   -> API Backend:        http://localhost:8000/docs"
-	@echo "   -> Prometheus Monitor: http://localhost:9090"
-	@echo "   -> Grafana Dashboards: http://localhost:3000"
+	@echo "   -> 🖥️  Frontend App:       http://localhost:4200"
+	@echo "   -> 📡 API Backend:        http://localhost:8000/docs"
+	@echo "   -> 🔍 Prometheus Monitor: http://localhost:9090"
+	@echo "   -> 📊 Grafana Dashboards: http://localhost:3000"
 
-# --- 4. EJECUCIÓN MAESTRA ---
+# --- 4. EL COMANDO MAESTRO ---
 run-all:
 	@echo "==================================================="
-	@echo "   ✈️  TFM MANTENIMIENTO PREDICTIVO - FASE 4  ✈️"
+	@echo "   ✈️  TFM MANTENIMIENTO - MODO FULL DOCKER   ✈️"
 	@echo "==================================================="
 	
 	@# 1. ETL
@@ -61,7 +60,7 @@ run-all:
 	fi
 
 	@# 2. Baseline
-	@read -p "2️⃣  ¿Entrenar modelo Baseline (Regresión)? (s/n): " base; \
+	@read -p "2️⃣  ¿Entrenar Baseline? (s/n): " base; \
 	if [ "$$base" = "s" ]; then \
 		$(MAKE) train-baseline; \
 	else \
@@ -69,28 +68,24 @@ run-all:
 	fi
 
 	@# 3. LSTM
-	@read -p "3️⃣  ¿Entrenar modelo LSTM? (s/n): " lstm; \
+	@read -p "3️⃣  ¿Entrenar LSTM? (s/n): " lstm; \
 	if [ "$$lstm" = "s" ]; then \
-		echo "☕ Iniciando entrenamiento de red neuronal..."; \
+		echo "☕ Entrenando modelo (Esto evitará bloqueos en tu Mac)..."; \
 		$(MAKE) train-lstm; \
 	else \
-		echo "⏩ Saltando LSTM (Usando modelo pre-entrenado)..."; \
+		echo "⏩ Saltando LSTM..."; \
 	fi
 
 	@echo ""
-	@echo "🚀 Desplegando infraestructura en Docker..."
+	@echo "🚀 Desplegando servicios..."
 	$(MAKE) serve-docker
 
-# --- 5. PARADA SEGURA ---
+# --- 5. LIMPIEZA ---
 stop:
 	@echo "🛑 Deteniendo servicios..."
 	docker-compose down
-	@echo "✅ Sistema detenido correctamente."
 
-# --- 6. LIMPIEZA TOTAL ---
 clean:
 	rm -rf output/output_csv/*
-	rm -rf mlruns
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	-docker-compose down
-	@echo "🧹 Entorno limpiado."
+	rm -rf models/*.keras models/*.save
+	@echo "🧹 Limpieza completada."

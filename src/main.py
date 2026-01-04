@@ -48,8 +48,8 @@ if __name__ == "__main__":
     if spark:
         spark.stop()
     
-    print("\tEjecutamos el DAG. PREFECT")
-    flujo_retraining()
+    #print("\tEjecutamos el DAG. PREFECT")
+    #flujo_retraining()
     
     print("Pipeline de datos finalizado. Los archivos están listos en 'output/'.")
     # El entrenamiento (LSTM) se ejecutará en el siguiente paso del Makefile.

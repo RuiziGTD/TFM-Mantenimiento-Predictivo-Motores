@@ -11,3 +11,4 @@ tensorflow
 python-multipart  
 prometheus-fastapi-instrumentator
 prefect
+seaborn
