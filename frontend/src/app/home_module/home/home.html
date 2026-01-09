@@ -1,0 +1,108 @@
+<div class="home-container"> 
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Predicción de fallo de motor</h1>
+      <p class="subtitle">
+        Sube un archivo de datos y obtén la predicción de salud del motor
+      </p>
+    </div>
+  </header>
+
+  <!-- Subida de archivo -->
+  <section class="uploader">
+    <input
+      id="fileInput"
+      class="file-input"
+      type="file"
+      (change)="onFileSelected($event)"
+    />
+    <label for="fileInput" class="file-label">Seleccionar archivo</label>
+    <button class="btn primary" (click)="predict()">Predecir</button>
+  </section>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard-grid" *ngIf="result">
+
+    <!-- Panel 1: Estado de salud -->
+    <div class="result-card panel full-width">
+      <h2>Estado de Salud de los Motores</h2>
+      <canvas #healthChart></canvas>
+    </div>
+
+    <!-- Panel 2: Lista filtrada -->
+    <div class="result-card panel">
+      <h2>Motores {{ selectedStatus || '' }}</h2>
+
+      <ul *ngIf="filteredMotors.length > 0; else emptyMessage">
+        <li *ngFor="let motor of filteredMotors">
+          ID: {{ motor.unit_id }} | RUL: {{ motor.rul | number:'1.0-0' }}
+        </li>
+      </ul>
+
+      <ng-template #emptyMessage>
+        <p class="muted">
+          Haz clic en una barra del gráfico para filtrar motores
+        </p>
+      </ng-template>
+    </div>
+
+    <!-- Panel 3: Top motores críticos -->
+    <div class="result-card panel">
+      <h2>Top motores críticos</h2>
+
+      <ul class="critical-list">
+        <li *ngFor="let motor of topCriticalMotorsList">
+          <span class="motor-id">Motor {{ motor.unit_id }}</span>
+          <span class="motor-rul">
+            RUL: {{ motor.rul | number:'1.0-0' }}
+          </span>
+        </li>
+      </ul>
+    </div>
+
+  <!-- Panel 4: Tabla inteligente -->
+  <div class="result-card panel full-width">
+    <h2>Listado de Motores</h2>
+
+    <!-- Controles de filtro -->
+    <div class="table-controls">
+      <input
+        type="text"
+        placeholder="Buscar motor..."
+        [(ngModel)]="searchText"
+        (input)="applyTableFilters()"
+      />
+
+      <select [(ngModel)]="statusFilter" (change)="applyTableFilters()">
+        <option value="ALL">Todos</option>
+        <option value="OK">OK</option>
+        <option value="AVISO">AVISO</option>
+        <option value="CRITICO">CRÍTICO</option>
+      </select>
+
+      <button class="btn primary" (click)="toggleSort()">
+        Orden RUL {{ sortDirection === 'asc' ? '↑' : '↓' }}
+      </button>
+    </div>
+
+    <!-- Tabla de datos -->
+    <div class="result-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Motor</th>
+            <th>RUL</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of filteredTableMotors">
+            <td>{{ m.unit_id }}</td>
+            <td>{{ m.rul | number:'1.0-0' }}</td>
+            <td>{{ m.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

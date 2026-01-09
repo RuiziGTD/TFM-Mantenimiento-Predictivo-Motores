@@ -6,4 +6,9 @@ matplotlib
 mlflow
 pymongo
 fastapi
-uvicorn  
+uvicorn
+tensorflow
+python-multipart  
+prometheus-fastapi-instrumentator
+prefect
+seaborn

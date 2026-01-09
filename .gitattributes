@@ -1,0 +1,5 @@
+# Forzar saltos de línea LF en scripts para evitar errores en Docker (Linux)
+*.sh text eol=lf
+Makefile text eol=lf
+Dockerfile* text eol=lf
+*.yml text eol=lf

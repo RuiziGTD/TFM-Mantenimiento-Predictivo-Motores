@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203
+exclude = .git,__pycache__,docs,old,build,dist,mlruns,.venv,env
+
+per-file-ignores =
+    # Ignorar imports no usados en __init__
+    __init__.py:F401
+    
+    # Permitir imports no usados y múltiples en spark.py
+    src/processing/spark.py:F401,E401
+    
+    # Permitir import * en estos archivos (aunque no es ideal, lo permitimos por ahora)
+    src/main.py:F403,F405
+    src/pipeline/pipeline.py:F403,F405
+    src/ingest/batch_ingest.py:F403,F405
+    
+    # Permitir f-strings vacíos en cleaning.py
+    src/processing/cleaning.py:F541
+
+    # Permitir imports no usados en los modelos (a veces pasa al prototipar)
+    src/modelo_ia/modelo_1.py:F401,F811,F841

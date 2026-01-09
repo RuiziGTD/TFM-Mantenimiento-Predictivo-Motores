@@ -1,0 +1,12 @@
+# Requisitos base para el proyecto:
+numpy
+pandas
+scikit-learn
+matplotlib
+mlflow
+pymongo
+fastapi
+uvicorn
+tensorflow
+python-multipart  
+prometheus-fastapi-instrumentator
