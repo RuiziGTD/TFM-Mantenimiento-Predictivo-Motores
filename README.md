@@ -23,8 +23,6 @@ El proyecto trasciende el modelado tradicional para ofrecer una arquitectura de 
 * **Observabilidad:** Monitorización de métricas en tiempo real mediante **Prometheus y Grafana**.
 * **Frontend:** Dashboard interactivo construido en **Angular**.
 
-![Arquitectura de Alto Nivel](./docs/arquitectura_alto_nivel.png)
-
 ---
 
 ## 📊 Resultados del Modelo y Métricas de Negocio
