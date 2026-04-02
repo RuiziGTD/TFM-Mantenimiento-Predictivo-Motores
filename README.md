@@ -23,7 +23,7 @@ El proyecto trasciende el modelado tradicional para ofrecer una arquitectura de 
 * **Observabilidad:** Monitorización de métricas en tiempo real mediante **Prometheus y Grafana**.
 * **Frontend:** Dashboard interactivo construido en **Angular**.
 
-![Arquitectura de Alto Nivel](./docs/arquitectura_alto_nivel.png)
+![Arquitectura de Alto Nivel](https://github.com/RuiziGTD/TFM-Mantenimiento-Predictivo-Motores/blob/main/docs/arquitectura_alto_nivel.JPG?raw=true)
 
 ---
 
